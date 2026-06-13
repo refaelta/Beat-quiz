@@ -272,8 +272,9 @@ function saveDB(){localStorage.setItem('bq_songs',JSON.stringify(DB));}
 const SNIP_MS=3000,FB_MS=1800,CIRC=226;
 const TC=['tc0','tc1','tc2','tc3'],RANKS=['gold','silver','bronze'],MEDALS=['🥇','🥈','🥉'];
 const G={genre:null,teams:['קבוצה א','קבוצה ב'],teamCnt:2,rounds:10,scores:[],round:0,songs:[],idx:0,
-  phase:'init',timerInt:null,snippetTO:null,yt:null,ytReady:false,startWatchdog:null,
+  phase:'init',timerInt:null,snippetTO:null,yt:null,ytReady:false,startWatchdog:null,fallbackTO:null,
   segment:0, /* which 3-sec chunk: 0=0-3, 1=3-6, ... */
+  loadedId:null, /* currently cued video id */
   editGenre:'festigal'};
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');if(id==='history')renderHistory();if(id==='editor')buildEditor();}
@@ -340,13 +341,23 @@ function delSong(i){
 (function loadYT(){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);})();
 window.onYouTubeIframeAPIReady=function(){G.yt=new YT.Player('yt-player',{height:'200',width:'200',playerVars:{autoplay:0,controls:0,disablekb:1,fs:0,playsinline:1,rel:0,modestbranding:1},events:{onReady:()=>{G.ytReady=true;},onStateChange:onYTState,onError:onYTErr}});};
 function onYTState(e){
+  // 1 = PLAYING
   if(e.data===1&&G.phase==='playing'){
     clearTimeout(G.startWatchdog);
+    clearTimeout(G.fallbackTO);     // real event fired — cancel fallback
+    if(G.timerInt)return;           // timer already running (started by fallback) — don't double
     setVinyl('spin');setHint('🎵 מקשיב...');
-    if(!G.timerInt)startRing();
+    startRing();
     clearTimeout(G.snippetTO);
     G.snippetTO=setTimeout(snippetDone,SNIP_MS);
   }
+}
+function jumpToSegment(startSec){
+  // seek to the segment and play exactly 3 sec, then pause via timer
+  try{
+    G.yt.seekTo(startSec,true);
+    G.yt.playVideo();
+  }catch(e){onYTErr({data:-1});}
 }
 function onYTErr(e){if(G.phase==='playing'||G.phase==='loading'){setHint('⚠️ שיר לא זמין — לחץ דלג');G.phase='guessing';setPBtn(false);setBuzz(true);}}
 
@@ -367,7 +378,7 @@ function startGame(){
   loadRound();
 }
 function loadRound(){
-  G.phase='idle';G.segment=0;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
+  G.phase='idle';G.segment=0;G.loadedId=null;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
   const s=cur();
   document.getElementById('lbl-round').textContent=`סיבוב ${G.round+1} / ${G.rounds}`;
   document.getElementById('lbl-title').textContent=s.t;document.getElementById('lbl-artist').textContent=s.a;
@@ -381,8 +392,11 @@ function loadRound(){
 
 // ── ACCUMULATIVE PLAY ────────────────────────
 function onPlay(){
-  if(G.phase==='playing'||G.phase==='guessing')return;
+  if(G.phase==='playing')return;            // already playing — ignore
+  if(G.phase==='done'||G.phase==='loading')return;
   if(!G.ytReady){setHint('⏳ הנגן עדיין נטען, נסה שוב');return;}
+  // allowed in 'idle' (first play) OR 'guessing' (next segment)
+  setBuzz(false);                            // disable buzz while a new segment plays
   const s=cur();
   const startSec=G.segment*3;       // 0, 3, 6, 9...
   const endSec=startSec+3;
@@ -390,10 +404,27 @@ function onPlay(){
   setHint(`⏳ טוען... (שניות ${startSec}-${endSec})`);
   document.getElementById('snippet-info').textContent=`▶ קטע ${G.segment+1} · שניות ${startSec}–${endSec}`;
   try{
-    G.yt.loadVideoById({videoId:s.id,startSeconds:startSec,endSeconds:endSec});
-    G.yt.playVideo();
+    if(G.loadedId!==s.id){
+      G.loadedId=s.id;
+      G.yt.loadVideoById({videoId:s.id,startSeconds:startSec});
+      G.yt.playVideo();
+    }else{
+      G.yt.seekTo(startSec,true);
+      G.yt.playVideo();
+    }
   }catch(e){setHint('⚠️ שגיאה — דלג');G.phase='guessing';setPBtn(false);setBuzz(true);return;}
   clearTimeout(G.startWatchdog);G.startWatchdog=setTimeout(()=>{if(G.phase==='playing'&&!G.timerInt)setHint('⚠️ השיר לא נטען — לחץ דלג');},6000);
+  // Fallback: if the PLAYING event doesn't fire within 1.2s (common on seek),
+  // start the timer manually so the snippet still stops after 3 seconds.
+  clearTimeout(G.fallbackTO);
+  G.fallbackTO=setTimeout(()=>{
+    if(G.phase==='playing'&&!G.timerInt){
+      setVinyl('spin');setHint('🎵 מקשיב...');
+      startRing();
+      clearTimeout(G.snippetTO);
+      G.snippetTO=setTimeout(snippetDone,SNIP_MS);
+    }
+  },1200);
 }
 
 function snippetDone(){
@@ -412,7 +443,7 @@ function onSkip(){if(G.phase==='done')return;G.phase='done';clearTimers();setBuz
 function reveal(){setVinyl('art');document.getElementById('song-lbl').classList.add('show');}
 function nextRound(){G.round++;G.idx++;if(G.round>=G.rounds){finish();return;}loadRound();}
 function showFB(ok,team,song){document.getElementById('fb-em').textContent=ok?'✅':'⏭';document.getElementById('fb-tt').textContent=ok?`${team} ענו נכון! 🎉`:'דילוג...';document.getElementById('fb-sg').textContent=`♪ ${song.t}${song.a?' — '+song.a:''}`;const o=document.getElementById('fb-overlay');o.classList.add('show');setTimeout(()=>o.classList.remove('show'),FB_MS);}
-function clearTimers(){clearInterval(G.timerInt);G.timerInt=null;clearTimeout(G.snippetTO);clearTimeout(G.startWatchdog);}
+function clearTimers(){clearInterval(G.timerInt);G.timerInt=null;clearTimeout(G.snippetTO);clearTimeout(G.startWatchdog);clearTimeout(G.fallbackTO);}
 function startRing(){resetRing();let t=0;const tick=80;G.timerInt=setInterval(()=>{t+=tick;const f=Math.min(1,t/SNIP_MS);document.getElementById('ring-bar').style.strokeDashoffset=CIRC*f;document.getElementById('ring-lbl').textContent=Math.max(0,Math.ceil((SNIP_MS-t)/1000));document.getElementById('ring-bar').style.stroke=f>.66?'#ef4444':f>.33?'#f59e0b':'var(--accent)';},tick);}
 function resetRing(){clearInterval(G.timerInt);G.timerInt=null;document.getElementById('ring-lbl').textContent='3';document.getElementById('ring-bar').style.strokeDashoffset=0;document.getElementById('ring-bar').style.stroke='var(--accent)';}
 function setRingEmpty(){document.getElementById('ring-bar').style.strokeDashoffset=CIRC;document.getElementById('ring-lbl').textContent='0';}
