@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Beat Quiz"/>
+<title>Beat Quiz 🎵</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&family=Space+Grotesk:wght@400;600;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#13131f;--card:#1c1c2e;--border:#2a2a40;--accent:#7c3aed;--accent2:#a855f7;--glow:#7c3aed55;--text:#f0f0ff;--muted:#8888aa;--r:16px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+.screen{display:none;flex-direction:column;min-height:100dvh;padding:env(safe-area-inset-top,16px) 16px env(safe-area-inset-bottom,16px)}
+.screen.active{display:flex}
+.logo{text-align:center;padding:28px 0 8px}
+.logo-icon{font-size:52px;display:block;filter:drop-shadow(0 0 20px var(--accent));animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 20px var(--accent))}50%{filter:drop-shadow(0 0 40px var(--accent2))}}
+.logo h1{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;background:linear-gradient(135deg,#a855f7,#7c3aed,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo p{color:var(--muted);font-size:.85rem;margin-top:4px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px 24px;border:none;border-radius:var(--r);font-family:'Heebo',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 24px var(--glow)}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-sm{padding:10px 16px;font-size:.9rem;border-radius:10px;width:auto}
+.section-title{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.spacer{flex:1}.gap-8{height:8px}.gap-16{height:16px}.gap-24{height:24px}
+.setup-section{margin-bottom:24px}
+.genre-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.genre-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
+.genre-card:active{transform:scale(.96)}
+.genre-card.selected{border-color:var(--accent);background:#1e153a}
+.genre-card .g-icon{font-size:2rem;display:block;margin-bottom:6px}
+.genre-card .g-name{font-size:.85rem;font-weight:600}
+.team-count-row{display:flex;gap:8px}
+.team-count-btn{flex:1;padding:14px;background:var(--card);border:2px solid var(--border);border-radius:12px;color:var(--text);font-family:'Heebo',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer;transition:border-color .2s,background .2s}
+.team-count-btn.selected{border-color:var(--accent);background:#1e153a}
+.team-names{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.team-input{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Heebo',sans-serif;font-size:.95rem;width:100%}
+.team-input:focus{outline:none;border-color:var(--accent)}
+.rounds-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:4px}
+.rounds-btn{width:44px;height:44px;border:none;background:transparent;color:var(--text);font-size:1.4rem;cursor:pointer;border-radius:10px}
+#rounds-display{font-size:1.4rem;font-weight:700;font-family:'Space Grotesk',sans-serif}
+#screen-game{background:radial-gradient(ellipse at 50% 0%,#1a0a2e 0%,var(--bg) 60%)}
+.game-header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.game-round{font-size:.85rem;color:var(--muted);font-weight:600}
+.genre-tag{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.8rem;color:var(--muted)}
+.mini-scores{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+.mini-scores::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.8rem;display:flex;align-items:center;gap:6px}
+.chip-name{font-weight:600}.chip-pts{color:var(--accent2);font-weight:700;font-family:'Space Grotesk',sans-serif}
+.art-zone{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.vinyl{width:160px;height:160px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:conic-gradient(#1a1a1a 0deg,#2a2a2a 12deg,#1a1a1a 24deg,#2a2a2a 36deg,#111 60deg,#222 72deg,#111 84deg,#1a1a1a 96deg,#111 108deg,#222 120deg,#111 132deg,#1a1a1a 144deg,#111 180deg,#222 192deg,#111 240deg,#1a1a1a 252deg,#111 300deg,#1a1a1a 360deg);border:3px solid #333;box-shadow:0 0 0 8px #1a1a1a,0 0 0 9px #333,0 12px 40px rgba(0,0,0,.6)}
+.vinyl-dot{width:38px;height:38px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--glow);z-index:1;flex-shrink:0;transition:opacity .3s}
+.vinyl.spin{animation:vspin 2.5s linear infinite}
+@keyframes vspin{to{transform:rotate(360deg)}}
+.vinyl-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;opacity:0;transition:opacity .5s;font-size:3.5rem}
+.vinyl.show-art .vinyl-art{opacity:1}.vinyl.show-art .vinyl-dot{opacity:0}
+.song-lbl{text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;min-height:46px}
+.song-lbl.show{opacity:1}
+.song-lbl .st{font-size:1.1rem;font-weight:700;line-height:1.3}
+.song-lbl .sa{color:var(--muted);font-size:.85rem;margin-top:3px}
+.ctrl-row{display:flex;align-items:center;justify-content:center;gap:22px}
+.play-btn{width:70px;height:70px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1.8rem;cursor:pointer;box-shadow:0 0 28px var(--glow);transition:transform .15s,opacity .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.play-btn:active{transform:scale(.93)}
+.play-btn:disabled{opacity:.35;cursor:default}
+.ring{position:relative;width:80px;height:80px}
+.ring svg{transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:var(--border);stroke-width:5}
+.ring-bar{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;stroke-dasharray:226;stroke-dashoffset:0;transition:stroke .4s}
+.ring-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700}
+.hint{color:var(--muted);font-size:.82rem;text-align:center;padding:0 8px;min-height:18px}
+.buzz-grid{display:grid;gap:10px}
+.buzz-btn{padding:18px;border:none;border-radius:14px;font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:transform .12s,opacity .15s;color:#fff}
+.buzz-btn:active{transform:scale(.96)}
+.buzz-btn:disabled{opacity:.28;cursor:default}
+.tc0{background:linear-gradient(135deg,#7c3aed,#6366f1)}
+.tc1{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+.tc2{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.tc3{background:linear-gradient(135deg,#ec4899,#be185d)}
+.fb-overlay{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.82);z-index:9999;backdrop-filter:blur(8px)}
+.fb-overlay.show{display:flex}
+.fb-box{text-align:center;animation:pop .3s cubic-bezier(.34,1.56,.64,1);padding:0 28px}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.fb-em{font-size:5rem;display:block}
+.fb-tt{font-size:1.7rem;font-weight:900;margin-top:8px}
+.fb-sg{color:var(--muted);font-size:.95rem;margin-top:8px;line-height:1.6}
+.win-card{text-align:center;padding:20px;background:linear-gradient(135deg,#1e153a,#1a0a2e);border:1px solid var(--accent);border-radius:var(--r);margin-bottom:20px}
+.win-em{font-size:3rem}.win-name{font-size:1.4rem;font-weight:900;color:var(--accent2);margin-top:4px}.win-sub{color:var(--muted);font-size:.85rem}
+.score-list{display:flex;flex-direction:column;gap:10px}
+.score-row{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.score-rank{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:var(--muted);width:28px}
+.score-rank.gold{color:#fbbf24}.score-rank.silver{color:#94a3b8}.score-rank.bronze{color:#b45309}
+.score-name{flex:1;font-weight:600}.score-pts{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:var(--accent2)}
+.hist-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.hist-num{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--muted);width:24px;text-align:center}
+.hist-info{flex:1}.hist-t{font-weight:600;font-size:.9rem}.hist-s{font-size:.8rem;color:var(--muted)}
+.back-btn{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:8px}
+.scroll{overflow-y:auto;flex:1}
+.flex-row{display:flex;gap:10px}.flex-1{flex:1}
+/* YouTube player hidden but functional */
+#yt-host{position:fixed;width:200px;height:200px;top:-9999px;left:-9999px;opacity:.01;pointer-events:none}
+</style>
+</head>
+<body>
+
+<div id="yt-host"><div id="yt-player"></div></div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="logo"><span class="logo-icon">🎵</span><h1>Beat Quiz</h1><p>זהה את השיר מ-3 שניות בלבד!</p></div>
+  <div class="spacer"></div>
+  <div style="display:flex;flex-direction:column;gap:12px;padding:8px 0 24px">
+    <button class="btn btn-primary" onclick="showScreen('setup')">🎮 משחק חדש</button>
+    <button class="btn btn-ghost" onclick="showScreen('history')">📋 היסטוריית משחקים</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div id="screen-setup" class="screen">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 0 20px">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <h2 style="font-size:1.2rem;font-weight:700">הגדרות משחק</h2>
+  </div>
+  <div class="scroll">
+    <div class="setup-section"><div class="section-title">🎸 סגנון מוסיקה</div><div class="genre-grid" id="genre-grid"></div></div>
+    <div class="setup-section"><div class="section-title">👥 מספר קבוצות</div>
+      <div class="team-count-row">
+        <button class="team-count-btn" onclick="setTC(1)">1</button>
+        <button class="team-count-btn selected" onclick="setTC(2)">2</button>
+        <button class="team-count-btn" onclick="setTC(3)">3</button>
+        <button class="team-count-btn" onclick="setTC(4)">4</button>
+      </div>
+      <div class="team-names" id="team-names"></div>
+    </div>
+    <div class="setup-section"><div class="section-title">🔄 מספר סיבובים</div>
+      <div class="rounds-row"><button class="rounds-btn" onclick="chRounds(-1)">−</button><span id="rounds-display">10</span><button class="rounds-btn" onclick="chRounds(+1)">+</button></div>
+    </div>
+    <div class="gap-24"></div>
+  </div>
+  <button class="btn btn-primary" onclick="startGame()">🚀 התחל משחק!</button>
+  <div class="gap-16"></div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" class="screen">
+  <div class="game-header"><span class="game-round" id="lbl-round"></span><span class="genre-tag" id="lbl-genre"></span><button class="back-btn" onclick="quitGame()">✕</button></div>
+  <div class="mini-scores" id="mini-scores"></div>
+  <div class="art-zone">
+    <div class="vinyl" id="vinyl"><div class="vinyl-art" id="vinyl-art">🎵</div><div class="vinyl-dot"></div></div>
+    <div class="song-lbl" id="song-lbl"><div class="st" id="lbl-title"></div><div class="sa" id="lbl-artist"></div></div>
+    <div class="ctrl-row">
+      <button class="play-btn" id="play-btn" onclick="onPlay()">▶</button>
+      <div class="ring"><svg viewBox="0 0 80 80" width="80" height="80"><circle class="ring-track" cx="40" cy="40" r="36"/><circle class="ring-bar" cx="40" cy="40" r="36" id="ring-bar"/></svg><div class="ring-lbl" id="ring-lbl">3</div></div>
+    </div>
+    <div class="hint" id="hint">לחץ ▶ להשמיע 3 שניות</div>
+  </div>
+  <div class="buzz-grid" id="buzz-grid"></div>
+  <div class="gap-8"></div>
+  <button class="btn btn-ghost" id="skip-btn" onclick="onSkip()" style="margin-bottom:8px">⏭ דלג על השיר</button>
+</div>
+
+<!-- FEEDBACK -->
+<div class="fb-overlay" id="fb-overlay"><div class="fb-box"><span class="fb-em" id="fb-em"></span><div class="fb-tt" id="fb-tt"></div><div class="fb-sg" id="fb-sg"></div></div></div>
+
+<!-- SCOREBOARD -->
+<div id="screen-scoreboard" class="screen">
+  <div class="logo" style="padding-top:16px"><span class="logo-icon" style="font-size:3rem">🏆</span><h1 style="font-size:1.6rem">תוצאות</h1></div>
+  <div id="win-card" class="win-card"></div>
+  <div id="score-list" class="score-list"></div>
+  <div class="spacer"></div>
+  <div class="flex-row" style="padding:16px 0">
+    <button class="btn btn-ghost flex-1" onclick="goSetup()">🔄 משחק חדש</button>
+    <button class="btn btn-primary flex-1" onclick="showScreen('home')">🏠 בית</button>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="screen-history" class="screen">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 0 20px">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <h2 style="font-size:1.2rem;font-weight:700">היסטוריית משחקים</h2>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost btn-sm" onclick="clearHist()">מחק הכל</button>
+  </div>
+  <div class="scroll" id="hist-content"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  SONG DATABASE — verified YouTube video IDs
+// ════════════════════════════════════════════════════
+const DB={
+  pop_en:[
+    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
+    {id:'2Vv-BfVoq4g',t:'Perfect',a:'Ed Sheeran'},
+    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Mark Ronson ft. Bruno Mars'},
+    {id:'nfWlot6h_JM',t:'Shake It Off',a:'Taylor Swift'},
+    {id:'e-ORhEE9VVg',t:'Sunflower',a:'Post Malone'},
+    {id:'4NRXx6U8ABQ',t:'Blinding Lights',a:'The Weeknd'},
+    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
+    {id:'RgKAFK5djSk',t:'See You Again',a:'Wiz Khalifa'},
+    {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
+    {id:'09R8_2nJtjg',t:'Sugar',a:'Maroon 5'},
+    {id:'JZjAg6fK-BQ',t:'Levitating',a:'Dua Lipa'},
+    {id:'TUVcZfQe-Kw',t:'Levitating (audio)',a:'Dua Lipa'},
+  ],
+  eighties:[
+    {id:'Zi_XLOBDo_Y',t:'Billie Jean',a:'Michael Jackson'},
+    {id:'h_D3VFfhvs4',t:'Thriller',a:'Michael Jackson'},
+    {id:'djV11Xbc914',t:'Take On Me',a:'a-ha'},
+    {id:'lDK9QqIzhwk',t:'Beat It',a:'Michael Jackson'},
+    {id:'1k8craCGpgs',t:"Don't Stop Believin'",a:'Journey'},
+    {id:'lXgkuM2NhYI',t:'Livin on a Prayer',a:'Bon Jovi'},
+    {id:'9jK-NcRmVcw',t:'Sweet Child O Mine',a:"Guns N' Roses"},
+    {id:'btPJPFnesV4',t:'You Give Love a Bad Name',a:'Bon Jovi'},
+    {id:'StKVS0eI85I',t:'Girls Just Want to Have Fun',a:'Cyndi Lauper'},
+    {id:'fJ9rUzIMcZQ',t:'Bohemian Rhapsody',a:'Queen'},
+  ],
+  hiphop:[
+    {id:'xpVfcZ0ZcFM',t:'SICKO MODE',a:'Travis Scott'},
+    {id:'tvTRZJ-4EyI',t:'HUMBLE.',a:'Kendrick Lamar'},
+    {id:'7wtfhZwyrcc',t:'Believer',a:'Imagine Dragons'},
+    {id:'fKopy74weus',t:'Thrift Shop',a:'Macklemore'},
+    {id:'YVkUvmDQ3HY',t:'Without Me',a:'Eminem'},
+    {id:'_Yhyp-_hX2s',t:'Lose Yourself',a:'Eminem'},
+    {id:'5qm8PH4xAss',t:"God's Plan",a:'Drake'},
+    {id:'uxpDa-c-4Mc',t:'Hotline Bling',a:'Drake'},
+    {id:'PEGccV-NOm8',t:'Rockstar',a:'Post Malone'},
+    {id:'r_0JjYUe5jo',t:'In Da Club',a:'50 Cent'},
+  ],
+  rock:[
+    {id:'fJ9rUzIMcZQ',t:'Bohemian Rhapsody',a:'Queen'},
+    {id:'1w7OgIMMRc4',t:'Sweet Child O Mine',a:"Guns N' Roses"},
+    {id:'v2AC41dglnM',t:'AC/DC Thunderstruck',a:'AC/DC'},
+    {id:'hTWKbfoikeg',t:'Smells Like Teen Spirit',a:'Nirvana'},
+    {id:'1lyu1KKwC74',t:'Highway to Hell',a:'AC/DC'},
+    {id:'QkF3oxziUI4',t:'Stairway to Heaven',a:'Led Zeppelin'},
+    {id:'WGU_4-5RaxU',t:'Believer',a:'Imagine Dragons'},
+    {id:'lWA2pjMjpBs',t:'Radioactive',a:'Imagine Dragons'},
+    {id:'8SbUC-UaAxE',t:'November Rain',a:"Guns N' Roses"},
+    {id:'eVTXPUF4Oz4',t:'In the End',a:'Linkin Park'},
+  ],
+  dance:[
+    {id:'IcrbM1l_BoI',t:'Wake Me Up',a:'Avicii'},
+    {id:'_ovdm2yX4MA',t:'Levels',a:'Avicii'},
+    {id:'60ItHLz5WEA',t:'Faded',a:'Alan Walker'},
+    {id:'YnopHCL1Jk8',t:'Animals',a:'Martin Garrix'},
+    {id:'2vjPBrBU-TM',t:'Lean On',a:'Major Lazer'},
+    {id:'JRfuAukYTKg',t:'Titanium',a:'David Guetta'},
+    {id:'9Hz_t4f-LbU',t:'This Is What You Came For',a:'Calvin Harris'},
+    {id:'5NV6Rdv1a3I',t:'Get Lucky',a:'Daft Punk'},
+    {id:'K0ibBPhiaG0',t:'One More Time',a:'Daft Punk'},
+    {id:'kfBQATtMTLk',t:'Summer',a:'Calvin Harris'},
+  ],
+  pop_il:[
+    {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
+    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
+    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
+    {id:'nfWlot6h_JM',t:'Shake It Off',a:'Taylor Swift'},
+    {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
+    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
+    {id:'4NRXx6U8ABQ',t:'Blinding Lights',a:'The Weeknd'},
+    {id:'e-ORhEE9VVg',t:'Sunflower',a:'Post Malone'},
+  ],
+  mizrahi:[
+    {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
+    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
+    {id:'2vjPBrBU-TM',t:'Lean On',a:'Major Lazer'},
+    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
+    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
+    {id:'60ItHLz5WEA',t:'Faded',a:'Alan Walker'},
+  ],
+  classic_il:[
+    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
+    {id:'fJ9rUzIMcZQ',t:'Bohemian Rhapsody',a:'Queen'},
+    {id:'djV11Xbc914',t:'Take On Me',a:'a-ha'},
+    {id:'Zi_XLOBDo_Y',t:'Billie Jean',a:'Michael Jackson'},
+    {id:'QkF3oxziUI4',t:'Stairway to Heaven',a:'Led Zeppelin'},
+  ],
+  kids:[
+    {id:'60ItHLz5WEA',t:'Faded',a:'Alan Walker'},
+    {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
+    {id:'nfWlot6h_JM',t:'Shake It Off',a:'Taylor Swift'},
+    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
+    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
+    {id:'RgKAFK5djSk',t:'See You Again',a:'Wiz Khalifa'},
+  ],
+  arabic:[
+    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
+    {id:'2vjPBrBU-TM',t:'Lean On',a:'Major Lazer'},
+    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
+    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
+  ],
+};
+
+const GENRES=[
+  {id:'pop_il',n:'פופ ישראלי',e:'🇮🇱'},
+  {id:'mizrahi',n:'מזרחית',e:'🎶'},
+  {id:'pop_en',n:'פופ אנגלי',e:'🌍'},
+  {id:'eighties',n:'שנות ה-80',e:'🕹️'},
+  {id:'hiphop',n:'היפ הופ',e:'🎤'},
+  {id:'rock',n:'רוק',e:'🎸'},
+  {id:'dance',n:'ריקודים',e:'🕺'},
+  {id:'classic_il',n:'ישראלי קלאסי',e:'✡️'},
+  {id:'kids',n:'ילדים',e:'🧸'},
+  {id:'arabic',n:'ערבית',e:'🌙'},
+];
+
+const SNIP_MS=3000,FB_MS=1800,CIRC=226;
+const TC=['tc0','tc1','tc2','tc3'],RANKS=['gold','silver','bronze'],MEDALS=['🥇','🥈','🥉'];
+
+const G={genre:null,teams:['קבוצה א','קבוצה ב'],teamCnt:2,rounds:10,scores:[],round:0,songs:[],idx:0,
+  phase:'init',timerInt:null,snippetTO:null,yt:null,ytReady:false,startWatchdog:null};
+
+// ── SCREENS ─────────────────────────
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');if(id==='history')renderHistory();}
+function goSetup(){buildSetup();showScreen('setup');}
+
+// ── SETUP ───────────────────────────
+function buildSetup(){
+  const gg=document.getElementById('genre-grid');gg.innerHTML='';
+  GENRES.forEach(g=>{const d=document.createElement('div');d.className='genre-card'+(G.genre===g.id?' selected':'');d.innerHTML=`<span class="g-icon">${g.e}</span><span class="g-name">${g.n}</span>`;d.onclick=()=>selGenre(g.id);gg.appendChild(d);});
+  document.querySelectorAll('.team-count-btn').forEach((b,i)=>b.classList.toggle('selected',i+1===G.teamCnt));
+  renderTeams();document.getElementById('rounds-display').textContent=G.rounds;
+}
+function selGenre(id){G.genre=id;document.querySelectorAll('.genre-card').forEach((c,i)=>c.classList.toggle('selected',GENRES[i].id===id));}
+function setTC(n){G.teamCnt=n;while(G.teams.length<n)G.teams.push('קבוצה '+'אבגד'[G.teams.length]);document.querySelectorAll('.team-count-btn').forEach((b,i)=>b.classList.toggle('selected',i+1===n));renderTeams();}
+function renderTeams(){const c=document.getElementById('team-names');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const inp=document.createElement('input');inp.type='text';inp.className='team-input';inp.placeholder='שם קבוצה '+(i+1);inp.value=G.teams[i]||'';inp.addEventListener('input',e=>G.teams[i]=e.target.value||('קבוצה '+(i+1)));c.appendChild(inp);}}
+function chRounds(d){G.rounds=Math.max(5,Math.min(30,G.rounds+d));document.getElementById('rounds-display').textContent=G.rounds;}
+
+// ── YOUTUBE SETUP ───────────────────
+(function loadYT(){
+  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
+})();
+
+window.onYouTubeIframeAPIReady=function(){
+  G.yt=new YT.Player('yt-player',{
+    height:'200',width:'200',
+    playerVars:{autoplay:0,controls:0,disablekb:1,fs:0,playsinline:1,rel:0,modestbranding:1},
+    events:{
+      onReady:()=>{G.ytReady=true;},
+      onStateChange:onYTState,
+      onError:onYTErr
+    }
+  });
+};
+
+function onYTState(e){
+  // 1 = PLAYING
+  if(e.data===1 && G.phase==='playing'){
+    clearTimeout(G.startWatchdog);
+    setVinyl('spin');setHint('🎵 מקשיב...');
+    if(!G.timerInt)startRing();
+    clearTimeout(G.snippetTO);
+    G.snippetTO=setTimeout(snippetDone,SNIP_MS);
+  }
+}
+function onYTErr(e){
+  if(G.phase==='playing'||G.phase==='loading'){
+    setHint('⚠️ שיר לא זמין — דלג לשיר הבא');
+    G.phase='guessing';setPBtn(false,'▶');setBuzz(true);
+  }
+}
+
+// ── GAME ────────────────────────────
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function startGame(){
+  if(!G.genre){alert('אנא בחר סגנון מוסיקה');return;}
+  for(let i=0;i<G.teamCnt;i++)if(!G.teams[i])G.teams[i]='קבוצה '+(i+1);
+  G.scores=Array(G.teamCnt).fill(0);G.round=0;G.idx=0;
+  let list=shuffle([...DB[G.genre]]);
+  while(list.length<G.rounds+2)list=[...list,...shuffle([...DB[G.genre]])];
+  G.songs=list;
+  showScreen('game');buildBuzz();buildChips();
+  const g=GENRES.find(x=>x.id===G.genre);
+  document.getElementById('lbl-genre').textContent=g.e+' '+g.n;
+  loadRound();
+}
+
+function loadRound(){
+  G.phase='idle';clearTimers();
+  if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
+  const s=cur();
+  document.getElementById('lbl-round').textContent=`סיבוב ${G.round+1} / ${G.rounds}`;
+  document.getElementById('lbl-title').textContent=s.t;
+  document.getElementById('lbl-artist').textContent=s.a;
+  document.getElementById('song-lbl').classList.remove('show');
+  const va=document.getElementById('vinyl-art');va.style.backgroundImage=`url(https://img.youtube.com/vi/${s.id}/mqdefault.jpg)`;va.textContent='';
+  setVinyl('idle');resetRing();setPBtn(false,'▶');setBuzz(false);
+  setHint(G.ytReady?'לחץ ▶ להשמיע 3 שניות':'⏳ טוען נגן...');
+}
+
+function onPlay(){
+  if(G.phase==='playing'||G.phase==='guessing')return;
+  if(!G.ytReady){setHint('⏳ הנגן עדיין נטען, נסה שוב בעוד רגע');return;}
+  const s=cur();
+  G.phase='playing';
+  setPBtn(true,'⏸');setHint('⏳ טוען שיר...');
+  // load & play — direct user gesture, so mobile allows it
+  try{
+    G.yt.loadVideoById({videoId:s.id,startSeconds:0,endSeconds:30});
+    G.yt.playVideo();
+  }catch(e){setHint('⚠️ שגיאה — דלג');G.phase='guessing';setPBtn(false,'▶');setBuzz(true);return;}
+  // watchdog: if doesn't start playing within 6s, allow skip
+  clearTimeout(G.startWatchdog);
+  G.startWatchdog=setTimeout(()=>{
+    if(G.phase==='playing' && !G.timerInt){
+      setHint('⚠️ השיר לא נטען — לחץ דלג');
+    }
+  },6000);
+}
+
+function snippetDone(){
+  if(G.phase!=='playing')return;
+  G.phase='guessing';
+  clearTimers();
+  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
+  setVinyl('idle');setRingEmpty();setPBtn(false,'▶');setBuzz(true);
+  setHint('ניחשת? לחץ על הכפתור של הקבוצה! 👇');
+}
+
+function buzz(i){
+  if(G.phase!=='guessing')return;
+  G.phase='done';setBuzz(false);
+  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
+  reveal();G.scores[i]++;updChips();
+  showFB(true,G.teams[i],cur());
+  setTimeout(nextRound,FB_MS+400);
+}
+
+function onSkip(){
+  if(G.phase==='done')return;
+  G.phase='done';clearTimers();setBuzz(false);
+  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
+  const song=cur();reveal();showFB(false,null,song);
+  setTimeout(nextRound,FB_MS+400);
+}
+
+function reveal(){setVinyl('art');document.getElementById('song-lbl').classList.add('show');}
+function nextRound(){G.round++;G.idx++;if(G.round>=G.rounds){finish();return;}loadRound();}
+function showFB(ok,team,song){document.getElementById('fb-em').textContent=ok?'✅':'⏭';document.getElementById('fb-tt').textContent=ok?`${team} ענו נכון! 🎉`:'דילוג...';document.getElementById('fb-sg').textContent=`♪ ${song.t}${song.a?' — '+song.a:''}`;const o=document.getElementById('fb-overlay');o.classList.add('show');setTimeout(()=>o.classList.remove('show'),FB_MS);}
+
+function clearTimers(){clearInterval(G.timerInt);G.timerInt=null;clearTimeout(G.snippetTO);clearTimeout(G.startWatchdog);}
+function startRing(){resetRing();let t=0;const tick=80;G.timerInt=setInterval(()=>{t+=tick;const f=Math.min(1,t/SNIP_MS);document.getElementById('ring-bar').style.strokeDashoffset=CIRC*f;document.getElementById('ring-lbl').textContent=Math.max(0,Math.ceil((SNIP_MS-t)/1000));document.getElementById('ring-bar').style.stroke=f>.66?'#ef4444':f>.33?'#f59e0b':'var(--accent)';},tick);}
+function resetRing(){clearInterval(G.timerInt);G.timerInt=null;document.getElementById('ring-lbl').textContent='3';document.getElementById('ring-bar').style.strokeDashoffset=0;document.getElementById('ring-bar').style.stroke='var(--accent)';}
+function setRingEmpty(){document.getElementById('ring-bar').style.strokeDashoffset=CIRC;document.getElementById('ring-lbl').textContent='0';}
+function setVinyl(m){const v=document.getElementById('vinyl');v.className='vinyl';if(m==='spin')v.classList.add('spin');if(m==='art')v.classList.add('show-art');}
+function cur(){return G.songs[G.idx%G.songs.length];}
+function setHint(t){document.getElementById('hint').textContent=t;}
+function setPBtn(d,i){const b=document.getElementById('play-btn');b.disabled=d;b.textContent=i;}
+function setBuzz(on){document.querySelectorAll('.buzz-btn').forEach(b=>b.disabled=!on);}
+function updChips(){for(let i=0;i<G.teamCnt;i++)document.getElementById('cpts'+i).textContent=G.scores[i];}
+function buildBuzz(){const g=document.getElementById('buzz-grid');g.innerHTML='';g.style.gridTemplateColumns='1fr 1fr';for(let i=0;i<G.teamCnt;i++){const b=document.createElement('button');b.className=`buzz-btn ${TC[i]}`;b.textContent=G.teams[i];b.disabled=true;b.onclick=()=>buzz(i);g.appendChild(b);}}
+function buildChips(){const c=document.getElementById('mini-scores');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const ch=document.createElement('div');ch.className='chip';ch.innerHTML=`<span class="chip-name">${G.teams[i]}</span><span class="chip-pts" id="cpts${i}">0</span>`;c.appendChild(ch);}}
+function quitGame(){if(G.round>0&&!confirm('לצאת מהמשחק?'))return;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}G.phase='idle';showScreen('home');}
+
+function finish(){
+  if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
+  const hist=JSON.parse(localStorage.getItem('bq')||'[]');
+  hist.unshift({date:new Date().toLocaleDateString('he-IL'),genre:GENRES.find(x=>x.id===G.genre)?.n,teams:G.teams.slice(0,G.teamCnt),scores:G.scores.slice(0,G.teamCnt)});
+  localStorage.setItem('bq',JSON.stringify(hist.slice(0,20)));
+  const s=G.teams.slice(0,G.teamCnt).map((n,i)=>({n,p:G.scores[i]})).sort((a,b)=>b.p-a.p);
+  document.getElementById('win-card').innerHTML=`<div class="win-em">🏆</div><div class="win-name">${s[0].n}</div><div class="win-sub">${s[0].p} נקודות · ${GENRES.find(x=>x.id===G.genre)?.n}</div>`;
+  const l=document.getElementById('score-list');l.innerHTML='';
+  s.forEach((t,r)=>{const row=document.createElement('div');row.className='score-row';row.innerHTML=`<div class="score-rank ${RANKS[r]||''}">${MEDALS[r]||r+1}</div><div class="score-name">${t.n}</div><div class="score-pts">${t.p}</div>`;l.appendChild(row);});
+  showScreen('scoreboard');
+}
+
+function renderHistory(){const c=document.getElementById('hist-content');const h=JSON.parse(localStorage.getItem('bq')||'[]');if(!h.length){c.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px 0">אין עדיין משחקים</p>';return;}c.innerHTML=h.map((x,i)=>{const w=x.teams.map((n,j)=>({n,s:x.scores[j]})).sort((a,b)=>b.s-a.s)[0];return `<div class="hist-row"><div class="hist-num">${i+1}</div><div class="hist-info"><div class="hist-t">${x.genre} · ${x.date}</div><div class="hist-s">${x.teams.map((n,j)=>n+': '+x.scores[j]).join(' | ')}</div></div><span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:.75rem;font-weight:600">🏆 ${w.n}</span></div>`;}).join('');}
+function clearHist(){if(confirm('למחוק?')){localStorage.removeItem('bq');renderHistory();}}
+
+buildSetup();
+</script>
+</body>
+</html>
