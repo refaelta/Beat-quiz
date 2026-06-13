@@ -34,6 +34,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
 .genre-card.selected{border-color:var(--accent);background:#1e153a}
 .genre-card .g-icon{font-size:2rem;display:block;margin-bottom:6px}
 .genre-card .g-name{font-size:.85rem;font-weight:600}
+.genre-card .g-count{font-size:.7rem;color:var(--muted);margin-top:2px}
 .team-count-row{display:flex;gap:8px}
 .team-count-btn{flex:1;padding:14px;background:var(--card);border:2px solid var(--border);border-radius:12px;color:var(--text);font-family:'Heebo',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer;transition:border-color .2s,background .2s}
 .team-count-btn.selected{border-color:var(--accent);background:#1e153a}
@@ -100,7 +101,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
 .back-btn{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:8px}
 .scroll{overflow-y:auto;flex:1}
 .flex-row{display:flex;gap:10px}.flex-1{flex:1}
-/* YouTube player hidden but functional */
 #yt-host{position:fixed;width:200px;height:200px;top:-9999px;left:-9999px;opacity:.01;pointer-events:none}
 </style>
 </head>
@@ -189,140 +189,80 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
 </div>
 
 <script>
-// ════════════════════════════════════════════════════
-//  SONG DATABASE — verified YouTube video IDs
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════
+//  📝 רשימת השירים — קל לערוך!
+//  כל שיר: {id:'מזהה היוטיוב', t:'שם השיר', a:'אמן'}
+//  את מזהה היוטיוב לוקחים מהקישור: youtube.com/watch?v=XXXXXXX
+//  (החלק שאחרי v= הוא המזהה)
+// ════════════════════════════════════════════════════════════════
 const DB={
-  pop_en:[
-    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
-    {id:'2Vv-BfVoq4g',t:'Perfect',a:'Ed Sheeran'},
-    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Mark Ronson ft. Bruno Mars'},
-    {id:'nfWlot6h_JM',t:'Shake It Off',a:'Taylor Swift'},
-    {id:'e-ORhEE9VVg',t:'Sunflower',a:'Post Malone'},
-    {id:'4NRXx6U8ABQ',t:'Blinding Lights',a:'The Weeknd'},
-    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
-    {id:'RgKAFK5djSk',t:'See You Again',a:'Wiz Khalifa'},
-    {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
-    {id:'09R8_2nJtjg',t:'Sugar',a:'Maroon 5'},
-    {id:'JZjAg6fK-BQ',t:'Levitating',a:'Dua Lipa'},
-    {id:'TUVcZfQe-Kw',t:'Levitating (audio)',a:'Dua Lipa'},
-  ],
-  eighties:[
-    {id:'Zi_XLOBDo_Y',t:'Billie Jean',a:'Michael Jackson'},
-    {id:'h_D3VFfhvs4',t:'Thriller',a:'Michael Jackson'},
-    {id:'djV11Xbc914',t:'Take On Me',a:'a-ha'},
-    {id:'lDK9QqIzhwk',t:'Beat It',a:'Michael Jackson'},
-    {id:'1k8craCGpgs',t:"Don't Stop Believin'",a:'Journey'},
-    {id:'lXgkuM2NhYI',t:'Livin on a Prayer',a:'Bon Jovi'},
-    {id:'9jK-NcRmVcw',t:'Sweet Child O Mine',a:"Guns N' Roses"},
-    {id:'btPJPFnesV4',t:'You Give Love a Bad Name',a:'Bon Jovi'},
-    {id:'StKVS0eI85I',t:'Girls Just Want to Have Fun',a:'Cyndi Lauper'},
-    {id:'fJ9rUzIMcZQ',t:'Bohemian Rhapsody',a:'Queen'},
-  ],
-  hiphop:[
-    {id:'xpVfcZ0ZcFM',t:'SICKO MODE',a:'Travis Scott'},
-    {id:'tvTRZJ-4EyI',t:'HUMBLE.',a:'Kendrick Lamar'},
-    {id:'7wtfhZwyrcc',t:'Believer',a:'Imagine Dragons'},
-    {id:'fKopy74weus',t:'Thrift Shop',a:'Macklemore'},
-    {id:'YVkUvmDQ3HY',t:'Without Me',a:'Eminem'},
-    {id:'_Yhyp-_hX2s',t:'Lose Yourself',a:'Eminem'},
-    {id:'5qm8PH4xAss',t:"God's Plan",a:'Drake'},
-    {id:'uxpDa-c-4Mc',t:'Hotline Bling',a:'Drake'},
-    {id:'PEGccV-NOm8',t:'Rockstar',a:'Post Malone'},
-    {id:'r_0JjYUe5jo',t:'In Da Club',a:'50 Cent'},
-  ],
-  rock:[
-    {id:'fJ9rUzIMcZQ',t:'Bohemian Rhapsody',a:'Queen'},
-    {id:'1w7OgIMMRc4',t:'Sweet Child O Mine',a:"Guns N' Roses"},
-    {id:'v2AC41dglnM',t:'AC/DC Thunderstruck',a:'AC/DC'},
-    {id:'hTWKbfoikeg',t:'Smells Like Teen Spirit',a:'Nirvana'},
-    {id:'1lyu1KKwC74',t:'Highway to Hell',a:'AC/DC'},
-    {id:'QkF3oxziUI4',t:'Stairway to Heaven',a:'Led Zeppelin'},
-    {id:'WGU_4-5RaxU',t:'Believer',a:'Imagine Dragons'},
-    {id:'lWA2pjMjpBs',t:'Radioactive',a:'Imagine Dragons'},
-    {id:'8SbUC-UaAxE',t:'November Rain',a:"Guns N' Roses"},
-    {id:'eVTXPUF4Oz4',t:'In the End',a:'Linkin Park'},
-  ],
-  dance:[
-    {id:'IcrbM1l_BoI',t:'Wake Me Up',a:'Avicii'},
-    {id:'_ovdm2yX4MA',t:'Levels',a:'Avicii'},
-    {id:'60ItHLz5WEA',t:'Faded',a:'Alan Walker'},
-    {id:'YnopHCL1Jk8',t:'Animals',a:'Martin Garrix'},
-    {id:'2vjPBrBU-TM',t:'Lean On',a:'Major Lazer'},
-    {id:'JRfuAukYTKg',t:'Titanium',a:'David Guetta'},
-    {id:'9Hz_t4f-LbU',t:'This Is What You Came For',a:'Calvin Harris'},
-    {id:'5NV6Rdv1a3I',t:'Get Lucky',a:'Daft Punk'},
-    {id:'K0ibBPhiaG0',t:'One More Time',a:'Daft Punk'},
-    {id:'kfBQATtMTLk',t:'Summer',a:'Calvin Harris'},
-  ],
-  pop_il:[
+  // ── פסטיגל ──
+  festigal:[
+    {id:'mqvjNTx4gE4',t:'Imagine - שיר הנושא',a:'פסטיגל 2025'},
+    {id:'c776yKKx9so',t:'מחרוזת שירי ארץ ישראל',a:'פסטיגל 2007'},
     {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
     {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
     {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
-    {id:'nfWlot6h_JM',t:'Shake It Off',a:'Taylor Swift'},
     {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
-    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
-    {id:'4NRXx6U8ABQ',t:'Blinding Lights',a:'The Weeknd'},
-    {id:'e-ORhEE9VVg',t:'Sunflower',a:'Post Malone'},
   ],
+  // ── שירי ילדים ──
+  kids:[
+    {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
+    {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
+    {id:'60ItHLz5WEA',t:'Faded',a:'Alan Walker'},
+    {id:'nfWlot6h_JM',t:'Shake It Off',a:'Taylor Swift'},
+    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
+  ],
+  // ── מזרחית ──
   mizrahi:[
     {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
+    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
     {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
-    {id:'2vjPBrBU-TM',t:'Lean On',a:'Major Lazer'},
     {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
-    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
-    {id:'60ItHLz5WEA',t:'Faded',a:'Alan Walker'},
+    {id:'2vjPBrBU-TM',t:'Lean On',a:'Major Lazer'},
   ],
-  classic_il:[
+  // ── פופ ישראלי עכשווי ──
+  pop_now:[
+    {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
+    {id:'mqvjNTx4gE4',t:'Imagine',a:'פסטיגל'},
     {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
+    {id:'4NRXx6U8ABQ',t:'Blinding Lights',a:'The Weeknd'},
+  ],
+  // ── ישראלי קלאסי / שנים ──
+  classic:[
+    {id:'c776yKKx9so',t:'מחרוזת שירי ארץ ישראל',a:'פסטיגל'},
     {id:'fJ9rUzIMcZQ',t:'Bohemian Rhapsody',a:'Queen'},
-    {id:'djV11Xbc914',t:'Take On Me',a:'a-ha'},
     {id:'Zi_XLOBDo_Y',t:'Billie Jean',a:'Michael Jackson'},
-    {id:'QkF3oxziUI4',t:'Stairway to Heaven',a:'Led Zeppelin'},
+    {id:'djV11Xbc914',t:'Take On Me',a:'a-ha'},
   ],
-  kids:[
-    {id:'60ItHLz5WEA',t:'Faded',a:'Alan Walker'},
-    {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
-    {id:'nfWlot6h_JM',t:'Shake It Off',a:'Taylor Swift'},
-    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
-    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
-    {id:'RgKAFK5djSk',t:'See You Again',a:'Wiz Khalifa'},
-  ],
-  arabic:[
-    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
-    {id:'2vjPBrBU-TM',t:'Lean On',a:'Major Lazer'},
-    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
-    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
+  // ── חגים (חנוכה/פורים) ──
+  holidays:[
+    {id:'mqvjNTx4gE4',t:'Imagine',a:'פסטיגל'},
+    {id:'c776yKKx9so',t:'מחרוזת ארץ ישראל',a:'פסטיגל'},
+    {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
   ],
 };
 
 const GENRES=[
-  {id:'pop_il',n:'פופ ישראלי',e:'🇮🇱'},
-  {id:'mizrahi',n:'מזרחית',e:'🎶'},
-  {id:'pop_en',n:'פופ אנגלי',e:'🌍'},
-  {id:'eighties',n:'שנות ה-80',e:'🕹️'},
-  {id:'hiphop',n:'היפ הופ',e:'🎤'},
-  {id:'rock',n:'רוק',e:'🎸'},
-  {id:'dance',n:'ריקודים',e:'🕺'},
-  {id:'classic_il',n:'ישראלי קלאסי',e:'✡️'},
-  {id:'kids',n:'ילדים',e:'🧸'},
-  {id:'arabic',n:'ערבית',e:'🌙'},
+  {id:'festigal',n:'פסטיגל',e:'🎭'},
+  {id:'kids',    n:'שירי ילדים',e:'🧸'},
+  {id:'mizrahi', n:'מזרחית',e:'🎶'},
+  {id:'pop_now', n:'פופ עכשווי',e:'🇮🇱'},
+  {id:'classic', n:'קלאסי / שנים',e:'✡️'},
+  {id:'holidays',n:'חגים',e:'🕎'},
 ];
 
 const SNIP_MS=3000,FB_MS=1800,CIRC=226;
 const TC=['tc0','tc1','tc2','tc3'],RANKS=['gold','silver','bronze'],MEDALS=['🥇','🥈','🥉'];
-
 const G={genre:null,teams:['קבוצה א','קבוצה ב'],teamCnt:2,rounds:10,scores:[],round:0,songs:[],idx:0,
   phase:'init',timerInt:null,snippetTO:null,yt:null,ytReady:false,startWatchdog:null};
 
-// ── SCREENS ─────────────────────────
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');if(id==='history')renderHistory();}
 function goSetup(){buildSetup();showScreen('setup');}
 
-// ── SETUP ───────────────────────────
 function buildSetup(){
   const gg=document.getElementById('genre-grid');gg.innerHTML='';
-  GENRES.forEach(g=>{const d=document.createElement('div');d.className='genre-card'+(G.genre===g.id?' selected':'');d.innerHTML=`<span class="g-icon">${g.e}</span><span class="g-name">${g.n}</span>`;d.onclick=()=>selGenre(g.id);gg.appendChild(d);});
+  GENRES.forEach(g=>{const cnt=(DB[g.id]||[]).length;const d=document.createElement('div');d.className='genre-card'+(G.genre===g.id?' selected':'');d.innerHTML=`<span class="g-icon">${g.e}</span><span class="g-name">${g.n}</span><span class="g-count">${cnt} שירים</span>`;d.onclick=()=>selGenre(g.id);gg.appendChild(d);});
   document.querySelectorAll('.team-count-btn').forEach((b,i)=>b.classList.toggle('selected',i+1===G.teamCnt));
   renderTeams();document.getElementById('rounds-display').textContent=G.rounds;
 }
@@ -331,42 +271,11 @@ function setTC(n){G.teamCnt=n;while(G.teams.length<n)G.teams.push('קבוצה '+
 function renderTeams(){const c=document.getElementById('team-names');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const inp=document.createElement('input');inp.type='text';inp.className='team-input';inp.placeholder='שם קבוצה '+(i+1);inp.value=G.teams[i]||'';inp.addEventListener('input',e=>G.teams[i]=e.target.value||('קבוצה '+(i+1)));c.appendChild(inp);}}
 function chRounds(d){G.rounds=Math.max(5,Math.min(30,G.rounds+d));document.getElementById('rounds-display').textContent=G.rounds;}
 
-// ── YOUTUBE SETUP ───────────────────
-(function loadYT(){
-  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';
-  document.head.appendChild(s);
-})();
+(function loadYT(){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);})();
+window.onYouTubeIframeAPIReady=function(){G.yt=new YT.Player('yt-player',{height:'200',width:'200',playerVars:{autoplay:0,controls:0,disablekb:1,fs:0,playsinline:1,rel:0,modestbranding:1},events:{onReady:()=>{G.ytReady=true;},onStateChange:onYTState,onError:onYTErr}});};
+function onYTState(e){if(e.data===1&&G.phase==='playing'){clearTimeout(G.startWatchdog);setVinyl('spin');setHint('🎵 מקשיב...');if(!G.timerInt)startRing();clearTimeout(G.snippetTO);G.snippetTO=setTimeout(snippetDone,SNIP_MS);}}
+function onYTErr(e){if(G.phase==='playing'||G.phase==='loading'){setHint('⚠️ שיר לא זמין — לחץ דלג');G.phase='guessing';setPBtn(false,'▶');setBuzz(true);}}
 
-window.onYouTubeIframeAPIReady=function(){
-  G.yt=new YT.Player('yt-player',{
-    height:'200',width:'200',
-    playerVars:{autoplay:0,controls:0,disablekb:1,fs:0,playsinline:1,rel:0,modestbranding:1},
-    events:{
-      onReady:()=>{G.ytReady=true;},
-      onStateChange:onYTState,
-      onError:onYTErr
-    }
-  });
-};
-
-function onYTState(e){
-  // 1 = PLAYING
-  if(e.data===1 && G.phase==='playing'){
-    clearTimeout(G.startWatchdog);
-    setVinyl('spin');setHint('🎵 מקשיב...');
-    if(!G.timerInt)startRing();
-    clearTimeout(G.snippetTO);
-    G.snippetTO=setTimeout(snippetDone,SNIP_MS);
-  }
-}
-function onYTErr(e){
-  if(G.phase==='playing'||G.phase==='loading'){
-    setHint('⚠️ שיר לא זמין — דלג לשיר הבא');
-    G.phase='guessing';setPBtn(false,'▶');setBuzz(true);
-  }
-}
-
-// ── GAME ────────────────────────────
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function startGame(){
@@ -377,74 +286,32 @@ function startGame(){
   while(list.length<G.rounds+2)list=[...list,...shuffle([...DB[G.genre]])];
   G.songs=list;
   showScreen('game');buildBuzz();buildChips();
-  const g=GENRES.find(x=>x.id===G.genre);
-  document.getElementById('lbl-genre').textContent=g.e+' '+g.n;
+  const g=GENRES.find(x=>x.id===G.genre);document.getElementById('lbl-genre').textContent=g.e+' '+g.n;
   loadRound();
 }
-
 function loadRound(){
-  G.phase='idle';clearTimers();
-  if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
+  G.phase='idle';clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
   const s=cur();
   document.getElementById('lbl-round').textContent=`סיבוב ${G.round+1} / ${G.rounds}`;
-  document.getElementById('lbl-title').textContent=s.t;
-  document.getElementById('lbl-artist').textContent=s.a;
+  document.getElementById('lbl-title').textContent=s.t;document.getElementById('lbl-artist').textContent=s.a;
   document.getElementById('song-lbl').classList.remove('show');
   const va=document.getElementById('vinyl-art');va.style.backgroundImage=`url(https://img.youtube.com/vi/${s.id}/mqdefault.jpg)`;va.textContent='';
   setVinyl('idle');resetRing();setPBtn(false,'▶');setBuzz(false);
   setHint(G.ytReady?'לחץ ▶ להשמיע 3 שניות':'⏳ טוען נגן...');
 }
-
 function onPlay(){
   if(G.phase==='playing'||G.phase==='guessing')return;
-  if(!G.ytReady){setHint('⏳ הנגן עדיין נטען, נסה שוב בעוד רגע');return;}
-  const s=cur();
-  G.phase='playing';
-  setPBtn(true,'⏸');setHint('⏳ טוען שיר...');
-  // load & play — direct user gesture, so mobile allows it
-  try{
-    G.yt.loadVideoById({videoId:s.id,startSeconds:0,endSeconds:30});
-    G.yt.playVideo();
-  }catch(e){setHint('⚠️ שגיאה — דלג');G.phase='guessing';setPBtn(false,'▶');setBuzz(true);return;}
-  // watchdog: if doesn't start playing within 6s, allow skip
-  clearTimeout(G.startWatchdog);
-  G.startWatchdog=setTimeout(()=>{
-    if(G.phase==='playing' && !G.timerInt){
-      setHint('⚠️ השיר לא נטען — לחץ דלג');
-    }
-  },6000);
+  if(!G.ytReady){setHint('⏳ הנגן עדיין נטען, נסה שוב');return;}
+  const s=cur();G.phase='playing';setPBtn(true,'⏸');setHint('⏳ טוען שיר...');
+  try{G.yt.loadVideoById({videoId:s.id,startSeconds:0,endSeconds:30});G.yt.playVideo();}catch(e){setHint('⚠️ שגיאה — דלג');G.phase='guessing';setPBtn(false,'▶');setBuzz(true);return;}
+  clearTimeout(G.startWatchdog);G.startWatchdog=setTimeout(()=>{if(G.phase==='playing'&&!G.timerInt)setHint('⚠️ השיר לא נטען — לחץ דלג');},6000);
 }
-
-function snippetDone(){
-  if(G.phase!=='playing')return;
-  G.phase='guessing';
-  clearTimers();
-  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
-  setVinyl('idle');setRingEmpty();setPBtn(false,'▶');setBuzz(true);
-  setHint('ניחשת? לחץ על הכפתור של הקבוצה! 👇');
-}
-
-function buzz(i){
-  if(G.phase!=='guessing')return;
-  G.phase='done';setBuzz(false);
-  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
-  reveal();G.scores[i]++;updChips();
-  showFB(true,G.teams[i],cur());
-  setTimeout(nextRound,FB_MS+400);
-}
-
-function onSkip(){
-  if(G.phase==='done')return;
-  G.phase='done';clearTimers();setBuzz(false);
-  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
-  const song=cur();reveal();showFB(false,null,song);
-  setTimeout(nextRound,FB_MS+400);
-}
-
+function snippetDone(){if(G.phase!=='playing')return;G.phase='guessing';clearTimers();if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}setVinyl('idle');setRingEmpty();setPBtn(false,'▶');setBuzz(true);setHint('ניחשת? לחץ על הכפתור של הקבוצה! 👇');}
+function buzz(i){if(G.phase!=='guessing')return;G.phase='done';setBuzz(false);if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}reveal();G.scores[i]++;updChips();showFB(true,G.teams[i],cur());setTimeout(nextRound,FB_MS+400);}
+function onSkip(){if(G.phase==='done')return;G.phase='done';clearTimers();setBuzz(false);if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}const song=cur();reveal();showFB(false,null,song);setTimeout(nextRound,FB_MS+400);}
 function reveal(){setVinyl('art');document.getElementById('song-lbl').classList.add('show');}
 function nextRound(){G.round++;G.idx++;if(G.round>=G.rounds){finish();return;}loadRound();}
 function showFB(ok,team,song){document.getElementById('fb-em').textContent=ok?'✅':'⏭';document.getElementById('fb-tt').textContent=ok?`${team} ענו נכון! 🎉`:'דילוג...';document.getElementById('fb-sg').textContent=`♪ ${song.t}${song.a?' — '+song.a:''}`;const o=document.getElementById('fb-overlay');o.classList.add('show');setTimeout(()=>o.classList.remove('show'),FB_MS);}
-
 function clearTimers(){clearInterval(G.timerInt);G.timerInt=null;clearTimeout(G.snippetTO);clearTimeout(G.startWatchdog);}
 function startRing(){resetRing();let t=0;const tick=80;G.timerInt=setInterval(()=>{t+=tick;const f=Math.min(1,t/SNIP_MS);document.getElementById('ring-bar').style.strokeDashoffset=CIRC*f;document.getElementById('ring-lbl').textContent=Math.max(0,Math.ceil((SNIP_MS-t)/1000));document.getElementById('ring-bar').style.stroke=f>.66?'#ef4444':f>.33?'#f59e0b':'var(--accent)';},tick);}
 function resetRing(){clearInterval(G.timerInt);G.timerInt=null;document.getElementById('ring-lbl').textContent='3';document.getElementById('ring-bar').style.strokeDashoffset=0;document.getElementById('ring-bar').style.stroke='var(--accent)';}
@@ -458,22 +325,9 @@ function updChips(){for(let i=0;i<G.teamCnt;i++)document.getElementById('cpts'+i
 function buildBuzz(){const g=document.getElementById('buzz-grid');g.innerHTML='';g.style.gridTemplateColumns='1fr 1fr';for(let i=0;i<G.teamCnt;i++){const b=document.createElement('button');b.className=`buzz-btn ${TC[i]}`;b.textContent=G.teams[i];b.disabled=true;b.onclick=()=>buzz(i);g.appendChild(b);}}
 function buildChips(){const c=document.getElementById('mini-scores');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const ch=document.createElement('div');ch.className='chip';ch.innerHTML=`<span class="chip-name">${G.teams[i]}</span><span class="chip-pts" id="cpts${i}">0</span>`;c.appendChild(ch);}}
 function quitGame(){if(G.round>0&&!confirm('לצאת מהמשחק?'))return;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}G.phase='idle';showScreen('home');}
-
-function finish(){
-  if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
-  const hist=JSON.parse(localStorage.getItem('bq')||'[]');
-  hist.unshift({date:new Date().toLocaleDateString('he-IL'),genre:GENRES.find(x=>x.id===G.genre)?.n,teams:G.teams.slice(0,G.teamCnt),scores:G.scores.slice(0,G.teamCnt)});
-  localStorage.setItem('bq',JSON.stringify(hist.slice(0,20)));
-  const s=G.teams.slice(0,G.teamCnt).map((n,i)=>({n,p:G.scores[i]})).sort((a,b)=>b.p-a.p);
-  document.getElementById('win-card').innerHTML=`<div class="win-em">🏆</div><div class="win-name">${s[0].n}</div><div class="win-sub">${s[0].p} נקודות · ${GENRES.find(x=>x.id===G.genre)?.n}</div>`;
-  const l=document.getElementById('score-list');l.innerHTML='';
-  s.forEach((t,r)=>{const row=document.createElement('div');row.className='score-row';row.innerHTML=`<div class="score-rank ${RANKS[r]||''}">${MEDALS[r]||r+1}</div><div class="score-name">${t.n}</div><div class="score-pts">${t.p}</div>`;l.appendChild(row);});
-  showScreen('scoreboard');
-}
-
+function finish(){if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}const hist=JSON.parse(localStorage.getItem('bq')||'[]');hist.unshift({date:new Date().toLocaleDateString('he-IL'),genre:GENRES.find(x=>x.id===G.genre)?.n,teams:G.teams.slice(0,G.teamCnt),scores:G.scores.slice(0,G.teamCnt)});localStorage.setItem('bq',JSON.stringify(hist.slice(0,20)));const s=G.teams.slice(0,G.teamCnt).map((n,i)=>({n,p:G.scores[i]})).sort((a,b)=>b.p-a.p);document.getElementById('win-card').innerHTML=`<div class="win-em">🏆</div><div class="win-name">${s[0].n}</div><div class="win-sub">${s[0].p} נקודות · ${GENRES.find(x=>x.id===G.genre)?.n}</div>`;const l=document.getElementById('score-list');l.innerHTML='';s.forEach((t,r)=>{const row=document.createElement('div');row.className='score-row';row.innerHTML=`<div class="score-rank ${RANKS[r]||''}">${MEDALS[r]||r+1}</div><div class="score-name">${t.n}</div><div class="score-pts">${t.p}</div>`;l.appendChild(row);});showScreen('scoreboard');}
 function renderHistory(){const c=document.getElementById('hist-content');const h=JSON.parse(localStorage.getItem('bq')||'[]');if(!h.length){c.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px 0">אין עדיין משחקים</p>';return;}c.innerHTML=h.map((x,i)=>{const w=x.teams.map((n,j)=>({n,s:x.scores[j]})).sort((a,b)=>b.s-a.s)[0];return `<div class="hist-row"><div class="hist-num">${i+1}</div><div class="hist-info"><div class="hist-t">${x.genre} · ${x.date}</div><div class="hist-s">${x.teams.map((n,j)=>n+': '+x.scores[j]).join(' | ')}</div></div><span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:.75rem;font-weight:600">🏆 ${w.n}</span></div>`;}).join('');}
 function clearHist(){if(confirm('למחוק?')){localStorage.removeItem('bq');renderHistory();}}
-
 buildSetup();
 </script>
 </body>
