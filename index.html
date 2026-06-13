@@ -52,21 +52,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
 .mini-scores::-webkit-scrollbar{display:none}
 .chip{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.8rem;display:flex;align-items:center;gap:6px}
 .chip-name{font-weight:600}.chip-pts{color:var(--accent2);font-weight:700;font-family:'Space Grotesk',sans-serif}
-.art-zone{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.vinyl{width:160px;height:160px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:conic-gradient(#1a1a1a 0deg,#2a2a2a 12deg,#1a1a1a 24deg,#2a2a2a 36deg,#111 60deg,#222 72deg,#111 84deg,#1a1a1a 96deg,#111 108deg,#222 120deg,#111 132deg,#1a1a1a 144deg,#111 180deg,#222 192deg,#111 240deg,#1a1a1a 252deg,#111 300deg,#1a1a1a 360deg);border:3px solid #333;box-shadow:0 0 0 8px #1a1a1a,0 0 0 9px #333,0 12px 40px rgba(0,0,0,.6)}
-.vinyl-dot{width:38px;height:38px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--glow);z-index:1;flex-shrink:0;transition:opacity .3s}
+.art-zone{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.vinyl{width:150px;height:150px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:conic-gradient(#1a1a1a 0deg,#2a2a2a 12deg,#1a1a1a 24deg,#2a2a2a 36deg,#111 60deg,#222 72deg,#111 84deg,#1a1a1a 96deg,#111 108deg,#222 120deg,#111 132deg,#1a1a1a 144deg,#111 180deg,#222 192deg,#111 240deg,#1a1a1a 252deg,#111 300deg,#1a1a1a 360deg);border:3px solid #333;box-shadow:0 0 0 8px #1a1a1a,0 0 0 9px #333,0 12px 40px rgba(0,0,0,.6)}
+.vinyl-dot{width:36px;height:36px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--glow);z-index:1;flex-shrink:0;transition:opacity .3s}
 .vinyl.spin{animation:vspin 2.5s linear infinite}
 @keyframes vspin{to{transform:rotate(360deg)}}
 .vinyl-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;opacity:0;transition:opacity .5s;font-size:3.5rem}
 .vinyl.show-art .vinyl-art{opacity:1}.vinyl.show-art .vinyl-dot{opacity:0}
-.song-lbl{text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;min-height:46px}
+.snippet-info{font-size:.78rem;color:var(--accent2);font-weight:600;min-height:18px}
+.song-lbl{text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;min-height:42px}
 .song-lbl.show{opacity:1}
 .song-lbl .st{font-size:1.1rem;font-weight:700;line-height:1.3}
 .song-lbl .sa{color:var(--muted);font-size:.85rem;margin-top:3px}
 .ctrl-row{display:flex;align-items:center;justify-content:center;gap:22px}
-.play-btn{width:70px;height:70px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1.8rem;cursor:pointer;box-shadow:0 0 28px var(--glow);transition:transform .15s,opacity .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.play-btn{width:70px;height:70px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1.6rem;cursor:pointer;box-shadow:0 0 28px var(--glow);transition:transform .15s,opacity .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
 .play-btn:active{transform:scale(.93)}
 .play-btn:disabled{opacity:.35;cursor:default}
+.play-btn .pb-sub{font-size:.5rem;font-weight:600;margin-top:2px}
 .ring{position:relative;width:80px;height:80px}
 .ring svg{transform:rotate(-90deg)}
 .ring-track{fill:none;stroke:var(--border);stroke-width:5}
@@ -101,6 +103,21 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
 .back-btn{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:8px}
 .scroll{overflow-y:auto;flex:1}
 .flex-row{display:flex;gap:10px}.flex-1{flex:1}
+/* editor */
+.editor-genre-sel{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.editor-genre-sel::-webkit-scrollbar{display:none}
+.eg-btn{flex-shrink:0;background:var(--card);border:2px solid var(--border);border-radius:20px;padding:8px 14px;font-size:.85rem;color:var(--text);cursor:pointer;font-family:'Heebo',sans-serif;white-space:nowrap}
+.eg-btn.sel{border-color:var(--accent);background:#1e153a}
+.song-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.song-item img{width:42px;height:42px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#000}
+.song-item .si-info{flex:1;min-width:0}
+.song-item .si-t{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-item .si-a{font-size:.75rem;color:var(--muted)}
+.song-item .si-del{background:none;border:none;color:var(--red,#ef4444);font-size:1.2rem;cursor:pointer;padding:4px 8px;flex-shrink:0}
+.add-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px}
+.add-box input{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--text);font-family:'Heebo',sans-serif;font-size:.9rem;width:100%;margin-bottom:8px}
+.add-box input:focus{outline:none;border-color:var(--accent)}
+.tip{font-size:.75rem;color:var(--muted);line-height:1.5;margin-bottom:10px}
 #yt-host{position:fixed;width:200px;height:200px;top:-9999px;left:-9999px;opacity:.01;pointer-events:none}
 </style>
 </head>
@@ -114,6 +131,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
   <div class="spacer"></div>
   <div style="display:flex;flex-direction:column;gap:12px;padding:8px 0 24px">
     <button class="btn btn-primary" onclick="showScreen('setup')">🎮 משחק חדש</button>
+    <button class="btn btn-ghost" onclick="showScreen('editor')">🎵 ניהול שירים</button>
     <button class="btn btn-ghost" onclick="showScreen('history')">📋 היסטוריית משחקים</button>
   </div>
 </div>
@@ -150,9 +168,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
   <div class="mini-scores" id="mini-scores"></div>
   <div class="art-zone">
     <div class="vinyl" id="vinyl"><div class="vinyl-art" id="vinyl-art">🎵</div><div class="vinyl-dot"></div></div>
+    <div class="snippet-info" id="snippet-info"></div>
     <div class="song-lbl" id="song-lbl"><div class="st" id="lbl-title"></div><div class="sa" id="lbl-artist"></div></div>
     <div class="ctrl-row">
-      <button class="play-btn" id="play-btn" onclick="onPlay()">▶</button>
+      <button class="play-btn" id="play-btn" onclick="onPlay()"><span>▶</span><span class="pb-sub" id="pb-sub">3 שניות</span></button>
       <div class="ring"><svg viewBox="0 0 80 80" width="80" height="80"><circle class="ring-track" cx="40" cy="40" r="36"/><circle class="ring-bar" cx="40" cy="40" r="36" id="ring-bar"/></svg><div class="ring-lbl" id="ring-lbl">3</div></div>
     </div>
     <div class="hint" id="hint">לחץ ▶ להשמיע 3 שניות</div>
@@ -177,6 +196,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
   </div>
 </div>
 
+<!-- EDITOR -->
+<div id="screen-editor" class="screen">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 0 16px">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <h2 style="font-size:1.2rem;font-weight:700">ניהול שירים</h2>
+  </div>
+  <div class="editor-genre-sel" id="editor-genre-sel"></div>
+  <div class="add-box">
+    <div class="tip">➕ הוסף שיר: פתח שיר ביוטיוב, העתק מהקישור את החלק שאחרי <b>v=</b> (או הדבק קישור מלא), והזן שם.</div>
+    <input id="add-link" placeholder="קישור יוטיוב או מזהה (למשל mqvjNTx4gE4)"/>
+    <input id="add-title" placeholder="שם השיר"/>
+    <input id="add-artist" placeholder="שם האמן (לא חובה)"/>
+    <button class="btn btn-primary btn-sm" style="width:100%" onclick="addSong()">➕ הוסף שיר</button>
+  </div>
+  <div class="scroll" id="song-list"></div>
+</div>
+
 <!-- HISTORY -->
 <div id="screen-history" class="screen">
   <div style="display:flex;align-items:center;gap:12px;padding:12px 0 20px">
@@ -190,56 +226,28 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
 
 <script>
 // ════════════════════════════════════════════════════════════════
-//  📝 רשימת השירים — קל לערוך!
-//  כל שיר: {id:'מזהה היוטיוב', t:'שם השיר', a:'אמן'}
-//  את מזהה היוטיוב לוקחים מהקישור: youtube.com/watch?v=XXXXXXX
-//  (החלק שאחרי v= הוא המזהה)
+//  מאגר שירים ברירת מחדל. ניתן להוסיף/למחוק דרך "ניהול שירים"
+//  והשינויים נשמרים אוטומטית במכשיר.
 // ════════════════════════════════════════════════════════════════
-const DB={
-  // ── פסטיגל ──
+const DEFAULT_DB={
   festigal:[
     {id:'mqvjNTx4gE4',t:'Imagine - שיר הנושא',a:'פסטיגל 2025'},
     {id:'c776yKKx9so',t:'מחרוזת שירי ארץ ישראל',a:'פסטיגל 2007'},
-    {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
-    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
-    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
-    {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
   ],
-  // ── שירי ילדים ──
   kids:[
     {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
-    {id:'CevxZvSJLk8',t:'Roar',a:'Katy Perry'},
-    {id:'60ItHLz5WEA',t:'Faded',a:'Alan Walker'},
-    {id:'nfWlot6h_JM',t:'Shake It Off',a:'Taylor Swift'},
-    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
   ],
-  // ── מזרחית ──
   mizrahi:[
     {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
-    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
-    {id:'OPf0YbXqDm0',t:'Uptown Funk',a:'Bruno Mars'},
-    {id:'kJQP7kiw5Fk',t:'Despacito',a:'Luis Fonsi'},
-    {id:'2vjPBrBU-TM',t:'Lean On',a:'Major Lazer'},
   ],
-  // ── פופ ישראלי עכשווי ──
   pop_now:[
     {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
-    {id:'mqvjNTx4gE4',t:'Imagine',a:'פסטיגל'},
-    {id:'JGwWNGJdvx8',t:'Shape of You',a:'Ed Sheeran'},
-    {id:'4NRXx6U8ABQ',t:'Blinding Lights',a:'The Weeknd'},
   ],
-  // ── ישראלי קלאסי / שנים ──
   classic:[
     {id:'c776yKKx9so',t:'מחרוזת שירי ארץ ישראל',a:'פסטיגל'},
-    {id:'fJ9rUzIMcZQ',t:'Bohemian Rhapsody',a:'Queen'},
-    {id:'Zi_XLOBDo_Y',t:'Billie Jean',a:'Michael Jackson'},
-    {id:'djV11Xbc914',t:'Take On Me',a:'a-ha'},
   ],
-  // ── חגים (חנוכה/פורים) ──
   holidays:[
     {id:'mqvjNTx4gE4',t:'Imagine',a:'פסטיגל'},
-    {id:'c776yKKx9so',t:'מחרוזת ארץ ישראל',a:'פסטיגל'},
-    {id:'sWFA9K52rWA',t:'שמח',a:'אייל גולן'},
   ],
 };
 
@@ -252,14 +260,26 @@ const GENRES=[
   {id:'holidays',n:'חגים',e:'🕎'},
 ];
 
+// load DB (merge defaults + user additions from localStorage)
+let DB=loadDB();
+function loadDB(){
+  const saved=localStorage.getItem('bq_songs');
+  if(saved){try{return JSON.parse(saved);}catch(e){}}
+  return JSON.parse(JSON.stringify(DEFAULT_DB));
+}
+function saveDB(){localStorage.setItem('bq_songs',JSON.stringify(DB));}
+
 const SNIP_MS=3000,FB_MS=1800,CIRC=226;
 const TC=['tc0','tc1','tc2','tc3'],RANKS=['gold','silver','bronze'],MEDALS=['🥇','🥈','🥉'];
 const G={genre:null,teams:['קבוצה א','קבוצה ב'],teamCnt:2,rounds:10,scores:[],round:0,songs:[],idx:0,
-  phase:'init',timerInt:null,snippetTO:null,yt:null,ytReady:false,startWatchdog:null};
+  phase:'init',timerInt:null,snippetTO:null,yt:null,ytReady:false,startWatchdog:null,
+  segment:0, /* which 3-sec chunk: 0=0-3, 1=3-6, ... */
+  editGenre:'festigal'};
 
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');if(id==='history')renderHistory();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');if(id==='history')renderHistory();if(id==='editor')buildEditor();}
 function goSetup(){buildSetup();showScreen('setup');}
 
+// ── SETUP ────────────────────────────────────
 function buildSetup(){
   const gg=document.getElementById('genre-grid');gg.innerHTML='';
   GENRES.forEach(g=>{const cnt=(DB[g.id]||[]).length;const d=document.createElement('div');d.className='genre-card'+(G.genre===g.id?' selected':'');d.innerHTML=`<span class="g-icon">${g.e}</span><span class="g-name">${g.n}</span><span class="g-count">${cnt} שירים</span>`;d.onclick=()=>selGenre(g.id);gg.appendChild(d);});
@@ -271,42 +291,122 @@ function setTC(n){G.teamCnt=n;while(G.teams.length<n)G.teams.push('קבוצה '+
 function renderTeams(){const c=document.getElementById('team-names');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const inp=document.createElement('input');inp.type='text';inp.className='team-input';inp.placeholder='שם קבוצה '+(i+1);inp.value=G.teams[i]||'';inp.addEventListener('input',e=>G.teams[i]=e.target.value||('קבוצה '+(i+1)));c.appendChild(inp);}}
 function chRounds(d){G.rounds=Math.max(5,Math.min(30,G.rounds+d));document.getElementById('rounds-display').textContent=G.rounds;}
 
+// ── EDITOR ───────────────────────────────────
+function buildEditor(){
+  const sel=document.getElementById('editor-genre-sel');sel.innerHTML='';
+  GENRES.forEach(g=>{const b=document.createElement('button');b.className='eg-btn'+(G.editGenre===g.id?' sel':'');b.textContent=g.e+' '+g.n;b.onclick=()=>{G.editGenre=g.id;buildEditor();};sel.appendChild(b);});
+  renderSongList();
+}
+function renderSongList(){
+  const c=document.getElementById('song-list');const songs=DB[G.editGenre]||[];
+  if(!songs.length){c.innerHTML='<p style="color:var(--muted);text-align:center;padding:30px 0">אין שירים בקטגוריה זו.<br>הוסף שיר ראשון למעלה ☝️</p>';return;}
+  c.innerHTML='';
+  songs.forEach((s,i)=>{
+    const d=document.createElement('div');d.className='song-item';
+    d.innerHTML=`<img src="https://img.youtube.com/vi/${s.id}/default.jpg" onerror="this.style.opacity=.2"/><div class="si-info"><div class="si-t">${s.t}</div><div class="si-a">${s.a||''}</div></div><button class="si-del" onclick="delSong(${i})">🗑️</button>`;
+    c.appendChild(d);
+  });
+}
+function extractId(input){
+  input=input.trim();
+  // full URL?
+  const m=input.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  if(m)return m[1];
+  // bare 11-char id?
+  if(/^[A-Za-z0-9_-]{11}$/.test(input))return input;
+  return null;
+}
+function addSong(){
+  const link=document.getElementById('add-link').value;
+  const title=document.getElementById('add-title').value.trim();
+  const artist=document.getElementById('add-artist').value.trim();
+  const id=extractId(link);
+  if(!id){alert('קישור/מזהה לא תקין. ודא שהעתקת קישור יוטיוב מלא או מזהה בן 11 תווים.');return;}
+  if(!title){alert('הזן שם לשיר');return;}
+  if(!DB[G.editGenre])DB[G.editGenre]=[];
+  DB[G.editGenre].push({id,t:title,a:artist});
+  saveDB();
+  document.getElementById('add-link').value='';
+  document.getElementById('add-title').value='';
+  document.getElementById('add-artist').value='';
+  renderSongList();
+}
+function delSong(i){
+  if(!confirm('למחוק את השיר?'))return;
+  DB[G.editGenre].splice(i,1);saveDB();renderSongList();
+}
+
+// ── YOUTUBE ──────────────────────────────────
 (function loadYT(){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);})();
 window.onYouTubeIframeAPIReady=function(){G.yt=new YT.Player('yt-player',{height:'200',width:'200',playerVars:{autoplay:0,controls:0,disablekb:1,fs:0,playsinline:1,rel:0,modestbranding:1},events:{onReady:()=>{G.ytReady=true;},onStateChange:onYTState,onError:onYTErr}});};
-function onYTState(e){if(e.data===1&&G.phase==='playing'){clearTimeout(G.startWatchdog);setVinyl('spin');setHint('🎵 מקשיב...');if(!G.timerInt)startRing();clearTimeout(G.snippetTO);G.snippetTO=setTimeout(snippetDone,SNIP_MS);}}
-function onYTErr(e){if(G.phase==='playing'||G.phase==='loading'){setHint('⚠️ שיר לא זמין — לחץ דלג');G.phase='guessing';setPBtn(false,'▶');setBuzz(true);}}
+function onYTState(e){
+  if(e.data===1&&G.phase==='playing'){
+    clearTimeout(G.startWatchdog);
+    setVinyl('spin');setHint('🎵 מקשיב...');
+    if(!G.timerInt)startRing();
+    clearTimeout(G.snippetTO);
+    G.snippetTO=setTimeout(snippetDone,SNIP_MS);
+  }
+}
+function onYTErr(e){if(G.phase==='playing'||G.phase==='loading'){setHint('⚠️ שיר לא זמין — לחץ דלג');G.phase='guessing';setPBtn(false);setBuzz(true);}}
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 
+// ── GAME ─────────────────────────────────────
 function startGame(){
   if(!G.genre){alert('אנא בחר סגנון מוסיקה');return;}
+  const pool=DB[G.genre]||[];
+  if(pool.length<1){alert('אין שירים בקטגוריה זו. הוסף שירים ב"ניהול שירים".');return;}
   for(let i=0;i<G.teamCnt;i++)if(!G.teams[i])G.teams[i]='קבוצה '+(i+1);
   G.scores=Array(G.teamCnt).fill(0);G.round=0;G.idx=0;
-  let list=shuffle([...DB[G.genre]]);
-  while(list.length<G.rounds+2)list=[...list,...shuffle([...DB[G.genre]])];
+  let list=shuffle([...pool]);
+  while(list.length<G.rounds+2)list=[...list,...shuffle([...pool])];
   G.songs=list;
   showScreen('game');buildBuzz();buildChips();
   const g=GENRES.find(x=>x.id===G.genre);document.getElementById('lbl-genre').textContent=g.e+' '+g.n;
   loadRound();
 }
 function loadRound(){
-  G.phase='idle';clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
+  G.phase='idle';G.segment=0;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
   const s=cur();
   document.getElementById('lbl-round').textContent=`סיבוב ${G.round+1} / ${G.rounds}`;
   document.getElementById('lbl-title').textContent=s.t;document.getElementById('lbl-artist').textContent=s.a;
   document.getElementById('song-lbl').classList.remove('show');
   const va=document.getElementById('vinyl-art');va.style.backgroundImage=`url(https://img.youtube.com/vi/${s.id}/mqdefault.jpg)`;va.textContent='';
-  setVinyl('idle');resetRing();setPBtn(false,'▶');setBuzz(false);
+  setVinyl('idle');resetRing();setPBtn(false);setBuzz(false);
+  document.getElementById('snippet-info').textContent='';
+  document.getElementById('pb-sub').textContent='3 שניות';
   setHint(G.ytReady?'לחץ ▶ להשמיע 3 שניות':'⏳ טוען נגן...');
 }
+
+// ── ACCUMULATIVE PLAY ────────────────────────
 function onPlay(){
   if(G.phase==='playing'||G.phase==='guessing')return;
   if(!G.ytReady){setHint('⏳ הנגן עדיין נטען, נסה שוב');return;}
-  const s=cur();G.phase='playing';setPBtn(true,'⏸');setHint('⏳ טוען שיר...');
-  try{G.yt.loadVideoById({videoId:s.id,startSeconds:0,endSeconds:30});G.yt.playVideo();}catch(e){setHint('⚠️ שגיאה — דלג');G.phase='guessing';setPBtn(false,'▶');setBuzz(true);return;}
+  const s=cur();
+  const startSec=G.segment*3;       // 0, 3, 6, 9...
+  const endSec=startSec+3;
+  G.phase='playing';setPBtn(true);
+  setHint(`⏳ טוען... (שניות ${startSec}-${endSec})`);
+  document.getElementById('snippet-info').textContent=`▶ קטע ${G.segment+1} · שניות ${startSec}–${endSec}`;
+  try{
+    G.yt.loadVideoById({videoId:s.id,startSeconds:startSec,endSeconds:endSec});
+    G.yt.playVideo();
+  }catch(e){setHint('⚠️ שגיאה — דלג');G.phase='guessing';setPBtn(false);setBuzz(true);return;}
   clearTimeout(G.startWatchdog);G.startWatchdog=setTimeout(()=>{if(G.phase==='playing'&&!G.timerInt)setHint('⚠️ השיר לא נטען — לחץ דלג');},6000);
 }
-function snippetDone(){if(G.phase!=='playing')return;G.phase='guessing';clearTimers();if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}setVinyl('idle');setRingEmpty();setPBtn(false,'▶');setBuzz(true);setHint('ניחשת? לחץ על הכפתור של הקבוצה! 👇');}
+
+function snippetDone(){
+  if(G.phase!=='playing')return;
+  G.phase='guessing';clearTimers();
+  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
+  setVinyl('idle');setRingEmpty();setBuzz(true);
+  G.segment++; // next press plays next 3 seconds
+  setPBtn(false);
+  document.getElementById('pb-sub').textContent=`עוד 3 שניות`;
+  setHint('נחשו ולחצו על הקבוצה 👇  או ▶ לעוד 3 שניות');
+}
+
 function buzz(i){if(G.phase!=='guessing')return;G.phase='done';setBuzz(false);if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}reveal();G.scores[i]++;updChips();showFB(true,G.teams[i],cur());setTimeout(nextRound,FB_MS+400);}
 function onSkip(){if(G.phase==='done')return;G.phase='done';clearTimers();setBuzz(false);if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}const song=cur();reveal();showFB(false,null,song);setTimeout(nextRound,FB_MS+400);}
 function reveal(){setVinyl('art');document.getElementById('song-lbl').classList.add('show');}
@@ -319,7 +419,7 @@ function setRingEmpty(){document.getElementById('ring-bar').style.strokeDashoffs
 function setVinyl(m){const v=document.getElementById('vinyl');v.className='vinyl';if(m==='spin')v.classList.add('spin');if(m==='art')v.classList.add('show-art');}
 function cur(){return G.songs[G.idx%G.songs.length];}
 function setHint(t){document.getElementById('hint').textContent=t;}
-function setPBtn(d,i){const b=document.getElementById('play-btn');b.disabled=d;b.textContent=i;}
+function setPBtn(d){const b=document.getElementById('play-btn');b.disabled=d;}
 function setBuzz(on){document.querySelectorAll('.buzz-btn').forEach(b=>b.disabled=!on);}
 function updChips(){for(let i=0;i<G.teamCnt;i++)document.getElementById('cpts'+i).textContent=G.scores[i];}
 function buildBuzz(){const g=document.getElementById('buzz-grid');g.innerHTML='';g.style.gridTemplateColumns='1fr 1fr';for(let i=0;i<G.teamCnt;i++){const b=document.createElement('button');b.className=`buzz-btn ${TC[i]}`;b.textContent=G.teams[i];b.disabled=true;b.onclick=()=>buzz(i);g.appendChild(b);}}
