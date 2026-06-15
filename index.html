@@ -203,8 +203,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
     <h2 style="font-size:1.2rem;font-weight:700">ניהול שירים</h2>
   </div>
   <div class="editor-genre-sel" id="editor-genre-sel"></div>
+
+  <div class="add-box" style="border-color:var(--accent)">
+    <div class="tip">🎵 <b>חיבור אוטומטי:</b> הדבק קישור לפלייליסט יוטיוב ציבורי. בכל משחק יימשכו ממנו שירים רנדומליים אוטומטית!</div>
+    <input id="playlist-link" placeholder="קישור פלייליסט יוטיוב (youtube.com/playlist?list=...)"/>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary btn-sm" style="flex:1" onclick="savePlaylistForGenre()">💾 שמור פלייליסט</button>
+      <button class="btn btn-ghost btn-sm" onclick="testPlaylist()">🔍 בדוק</button>
+    </div>
+    <div id="playlist-status" style="font-size:.78rem;color:var(--muted);margin-top:8px;min-height:16px"></div>
+  </div>
+
   <div class="add-box">
-    <div class="tip">➕ הוסף שיר: פתח שיר ביוטיוב, העתק מהקישור את החלק שאחרי <b>v=</b> (או הדבק קישור מלא), והזן שם.</div>
+    <div class="tip">➕ <b>הוספה ידנית:</b> פתח שיר ביוטיוב, העתק את הקישור והזן שם.</div>
     <input id="add-link" placeholder="קישור יוטיוב או מזהה (למשל mqvjNTx4gE4)"/>
     <input id="add-title" placeholder="שם השיר"/>
     <input id="add-artist" placeholder="שם האמן (לא חובה)"/>
@@ -260,6 +271,66 @@ const GENRES=[
   {id:'holidays',n:'חגים',e:'🕎'},
 ];
 
+// ════════════════════════════════════════════════════════════════
+//  YouTube Data API — משיכה אוטומטית של שירים מפלייליסטים
+// ════════════════════════════════════════════════════════════════
+const YT_API_KEY='AIzaSyB-dynSukMY61t77xOaV0LhLqskvCR3-aA';
+
+// פלייליסט ברירת מחדל לכל קטגוריה (ניתן לשנות במסך "ניהול שירים")
+const DEFAULT_PLAYLISTS={
+  festigal:'',  // הדבק כאן מזהה פלייליסט פסטיגל
+  kids:'',
+  mizrahi:'',
+  pop_now:'',
+  classic:'',
+  holidays:'',
+};
+
+function loadPlaylists(){
+  const saved=localStorage.getItem('bq_playlists');
+  if(saved){try{return {...DEFAULT_PLAYLISTS,...JSON.parse(saved)};}catch(e){}}
+  return {...DEFAULT_PLAYLISTS};
+}
+function savePlaylists(){localStorage.setItem('bq_playlists',JSON.stringify(PLAYLISTS));}
+let PLAYLISTS=loadPlaylists();
+
+// extract playlist ID from a URL or bare ID
+function extractPlaylistId(input){
+  input=(input||'').trim();
+  const m=input.match(/[?&]list=([A-Za-z0-9_-]+)/);
+  if(m)return m[1];
+  if(/^(PL|UU|FL|OL|RD)[A-Za-z0-9_-]+$/.test(input))return input;
+  return input||null;
+}
+
+// fetch all videos from a playlist (handles pagination, up to 200)
+async function fetchPlaylist(playlistId){
+  let songs=[],pageToken='',pages=0;
+  do{
+    const url=`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YT_API_KEY}${pageToken?'&pageToken='+pageToken:''}`;
+    const r=await fetch(url);
+    if(!r.ok){
+      const err=await r.json().catch(()=>({}));
+      throw new Error(err.error?.message||('HTTP '+r.status));
+    }
+    const d=await r.json();
+    (d.items||[]).forEach(it=>{
+      const sn=it.snippet;
+      const vid=sn?.resourceId?.videoId;
+      // skip private/deleted
+      if(vid && sn.title!=='Private video' && sn.title!=='Deleted video'){
+        // clean up title — try to split "Artist - Song"
+        let title=sn.title, artist=sn.videoOwnerChannelTitle||'';
+        songs.push({id:vid,t:title,a:artist});
+      }
+    });
+    pageToken=d.nextPageToken||'';
+    pages++;
+  }while(pageToken && pages<4);
+  return songs;
+}
+
+
 // load DB (merge defaults + user additions from localStorage)
 let DB=loadDB();
 function loadDB(){
@@ -296,7 +367,28 @@ function chRounds(d){G.rounds=Math.max(5,Math.min(30,G.rounds+d));document.getEl
 function buildEditor(){
   const sel=document.getElementById('editor-genre-sel');sel.innerHTML='';
   GENRES.forEach(g=>{const b=document.createElement('button');b.className='eg-btn'+(G.editGenre===g.id?' sel':'');b.textContent=g.e+' '+g.n;b.onclick=()=>{G.editGenre=g.id;buildEditor();};sel.appendChild(b);});
+  // show saved playlist for this genre
+  document.getElementById('playlist-link').value=PLAYLISTS[G.editGenre]||'';
+  document.getElementById('playlist-status').textContent=PLAYLISTS[G.editGenre]?'✓ פלייליסט מחובר':'אין פלייליסט מחובר';
   renderSongList();
+}
+function savePlaylistForGenre(){
+  const val=document.getElementById('playlist-link').value.trim();
+  PLAYLISTS[G.editGenre]=val;
+  savePlaylists();
+  document.getElementById('playlist-status').textContent=val?'✓ נשמר! בכל משחק יימשכו שירים אוטומטית':'הפלייליסט הוסר';
+}
+async function testPlaylist(){
+  const val=document.getElementById('playlist-link').value.trim();
+  const plId=extractPlaylistId(val);
+  if(!plId){document.getElementById('playlist-status').textContent='⚠️ קישור לא תקין';return;}
+  document.getElementById('playlist-status').textContent='⏳ בודק...';
+  try{
+    const songs=await fetchPlaylist(plId);
+    document.getElementById('playlist-status').textContent=`✓ נמצאו ${songs.length} שירים בפלייליסט!`;
+  }catch(e){
+    document.getElementById('playlist-status').textContent='⚠️ '+e.message;
+  }
 }
 function renderSongList(){
   const c=document.getElementById('song-list');const songs=DB[G.editGenre]||[];
@@ -364,19 +456,43 @@ function onYTErr(e){if(G.phase==='playing'||G.phase==='loading'){setHint('⚠️
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 // ── GAME ─────────────────────────────────────
-function startGame(){
+async function startGame(){
   if(!G.genre){alert('אנא בחר סגנון מוסיקה');return;}
-  const pool=DB[G.genre]||[];
-  if(pool.length<1){alert('אין שירים בקטגוריה זו. הוסף שירים ב"ניהול שירים".');return;}
   for(let i=0;i<G.teamCnt;i++)if(!G.teams[i])G.teams[i]='קבוצה '+(i+1);
   G.scores=Array(G.teamCnt).fill(0);G.round=0;G.idx=0;
+
+  showScreen('game');buildBuzz();buildChips();
+  const g=GENRES.find(x=>x.id===G.genre);document.getElementById('lbl-genre').textContent=g.e+' '+g.n;
+
+  // Try playlist auto-fetch first
+  let pool=[];
+  const plId=extractPlaylistId(PLAYLISTS[G.genre]);
+  if(plId){
+    document.getElementById('lbl-round').textContent='טוען...';
+    setHint('⏳ מושך שירים מהפלייליסט...');
+    setPBtn(true);document.getElementById('skip-btn').disabled=true;
+    try{
+      pool=await fetchPlaylist(plId);
+    }catch(e){
+      console.warn('playlist fetch failed:',e.message);
+      setHint('⚠️ '+e.message);
+    }
+    document.getElementById('skip-btn').disabled=false;
+  }
+  // fallback to manually-added songs
+  if(pool.length<1) pool=DB[G.genre]||[];
+  if(pool.length<1){
+    setHint('⚠️ אין שירים. הוסף פלייליסט או שירים ב"ניהול שירים".');
+    setPBtn(true);
+    return;
+  }
+
   let list=shuffle([...pool]);
   while(list.length<G.rounds+2)list=[...list,...shuffle([...pool])];
   G.songs=list;
-  showScreen('game');buildBuzz();buildChips();
-  const g=GENRES.find(x=>x.id===G.genre);document.getElementById('lbl-genre').textContent=g.e+' '+g.n;
   loadRound();
 }
+
 function loadRound(){
   G.phase='idle';G.segment=0;G.loadedId=null;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
   const s=cur();
