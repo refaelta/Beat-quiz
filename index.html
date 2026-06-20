@@ -3,122 +3,246 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#0a0a0f"/>
+<meta name="theme-color" content="#FF6B4A"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Beat Quiz"/>
-<title>Beat Quiz 🎵</title>
+<title>Beat Quiz</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&family=Space+Grotesk:wght@400;600;700&display=swap');
-:root{--bg:#0a0a0f;--surface:#13131f;--card:#1c1c2e;--border:#2a2a40;--accent:#7c3aed;--accent2:#a855f7;--glow:#7c3aed55;--text:#f0f0ff;--muted:#8888aa;--r:16px}
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Assistant:wght@400;500;600;700;800&display=swap');
+
+:root{
+  /* ── sunset palette ── */
+  --cream:#FFF8F3;
+  --coral:#FF6B4A;
+  --peach:#FF9558;
+  --gold:#FFC65C;
+  --magenta:#C44569;
+  --plum:#2D2438;
+  --plum-soft:#6B6478;
+
+  --bg-grad:linear-gradient(160deg,#FFD27D 0%,#FF9558 38%,#FF6B4A 68%,#C44569 100%);
+  --card:#FFFFFF;
+  --card-soft:#FFF1E8;
+  --line:#F1E2D6;
+  --text:#2D2438;
+  --muted:#9A8E9C;
+
+  --r:22px;
+  --r-sm:14px;
+  --shadow:0 10px 30px rgba(196,69,105,.13);
+  --shadow-lg:0 18px 50px rgba(196,69,105,.22);
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
-.screen{display:none;flex-direction:column;min-height:100dvh;padding:env(safe-area-inset-top,16px) 16px env(safe-area-inset-bottom,16px)}
+html,body{height:100%;font-family:'Assistant',sans-serif;color:var(--text);overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg-grad);background-attachment:fixed}
+
+.screen{display:none;flex-direction:column;min-height:100dvh;padding:env(safe-area-inset-top,18px) 18px env(safe-area-inset-bottom,18px)}
 .screen.active{display:flex}
-.logo{text-align:center;padding:28px 0 8px}
-.logo-icon{font-size:52px;display:block;filter:drop-shadow(0 0 20px var(--accent));animation:pulse 2.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{filter:drop-shadow(0 0 20px var(--accent))}50%{filter:drop-shadow(0 0 40px var(--accent2))}}
-.logo h1{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;background:linear-gradient(135deg,#a855f7,#7c3aed,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.logo p{color:var(--muted);font-size:.85rem;margin-top:4px}
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px 24px;border:none;border-radius:var(--r);font-family:'Heebo',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:transform .15s}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 24px var(--glow)}
-.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border)}
-.btn-sm{padding:10px 16px;font-size:.9rem;border-radius:10px;width:auto}
-.section-title{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
-.spacer{flex:1}.gap-8{height:8px}.gap-16{height:16px}.gap-24{height:24px}
-.setup-section{margin-bottom:24px}
-.genre-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.genre-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
-.genre-card:active{transform:scale(.96)}
-.genre-card.selected{border-color:var(--accent);background:#1e153a}
-.genre-card .g-icon{font-size:2rem;display:block;margin-bottom:6px}
-.genre-card .g-name{font-size:.85rem;font-weight:600}
-.genre-card .g-count{font-size:.7rem;color:var(--muted);margin-top:2px}
-.team-count-row{display:flex;gap:8px}
-.team-count-btn{flex:1;padding:14px;background:var(--card);border:2px solid var(--border);border-radius:12px;color:var(--text);font-family:'Heebo',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer;transition:border-color .2s,background .2s}
-.team-count-btn.selected{border-color:var(--accent);background:#1e153a}
-.team-names{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.team-input{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Heebo',sans-serif;font-size:.95rem;width:100%}
-.team-input:focus{outline:none;border-color:var(--accent)}
-.rounds-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:4px}
-.rounds-btn{width:44px;height:44px;border:none;background:transparent;color:var(--text);font-size:1.4rem;cursor:pointer;border-radius:10px}
-#rounds-display{font-size:1.4rem;font-weight:700;font-family:'Space Grotesk',sans-serif}
-#screen-game{background:radial-gradient(ellipse at 50% 0%,#1a0a2e 0%,var(--bg) 60%)}
-.game-header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-.game-round{font-size:.85rem;color:var(--muted);font-weight:600}
-.genre-tag{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.8rem;color:var(--muted)}
-.mini-scores{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+
+/* ── headings ── */
+h1,h2,h3{font-family:'Fredoka',sans-serif;font-weight:600}
+.display{font-family:'Fredoka',sans-serif;font-weight:700}
+
+/* ── HOME ── */
+.home-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px}
+.brand-mark{
+  width:130px;height:130px;border-radius:36px;
+  background:var(--card);box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:62px;margin-bottom:18px;position:relative;
+  animation:bob 3.4s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+.brand-mark::after{
+  content:'';position:absolute;inset:-6px;border-radius:42px;
+  border:3px dashed rgba(255,255,255,.6);animation:spinSlow 18s linear infinite;
+}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+.home-hero h1{font-size:3rem;color:#fff;letter-spacing:-1px;text-shadow:0 4px 16px rgba(196,69,105,.35);line-height:1}
+.home-hero .tag{color:rgba(255,255,255,.92);font-size:1.05rem;font-weight:600;margin-top:4px}
+
+.home-actions{display:flex;flex-direction:column;gap:13px;padding:10px 0 12px}
+
+/* ── buttons ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:17px 24px;border:none;border-radius:var(--r);font-family:'Fredoka',sans-serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--plum);color:#fff;box-shadow:0 8px 22px rgba(45,36,56,.3)}
+.btn-white{background:#fff;color:var(--plum);box-shadow:var(--shadow)}
+.btn-soft{background:rgba(255,255,255,.22);color:#fff;border:2px solid rgba(255,255,255,.5);backdrop-filter:blur(4px)}
+.btn-sm{padding:11px 18px;font-size:.95rem;border-radius:var(--r-sm);width:auto}
+
+/* ── top bar (inner screens) ── */
+.topbar{display:flex;align-items:center;gap:12px;padding:6px 0 18px}
+.topbar h2{font-size:1.3rem;color:#fff;text-shadow:0 2px 8px rgba(196,69,105,.3)}
+.icon-btn{width:42px;height:42px;border-radius:14px;border:none;background:rgba(255,255,255,.22);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;backdrop-filter:blur(4px);transition:background .2s}
+.icon-btn:active{background:rgba(255,255,255,.4)}
+
+/* ── card sheet ── */
+.sheet{background:var(--card);border-radius:28px;box-shadow:var(--shadow-lg);padding:22px 20px}
+.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+
+.label{font-family:'Fredoka',sans-serif;font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.setup-block{margin-bottom:22px}
+
+/* ── genre grid ── */
+.genre-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.genre-card{background:var(--card);border:none;border-radius:var(--r-sm);padding:18px 12px;text-align:center;cursor:pointer;transition:transform .14s,box-shadow .2s;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.genre-card::before{content:'';position:absolute;inset:0;background:var(--bg-grad);opacity:0;transition:opacity .25s}
+.genre-card>*{position:relative;z-index:1;transition:color .2s}
+.genre-card:active{transform:scale(.95)}
+.genre-card.selected::before{opacity:1}
+.genre-card.selected .g-icon,.genre-card.selected .g-name,.genre-card.selected .g-count{color:#fff}
+.genre-card .g-icon{font-size:2.1rem;display:block;margin-bottom:7px}
+.genre-card .g-name{font-family:'Fredoka',sans-serif;font-size:.92rem;font-weight:600;color:var(--text)}
+.genre-card .g-count{font-size:.72rem;color:var(--muted);margin-top:3px}
+
+/* ── team count ── */
+.seg-row{display:flex;gap:9px}
+.team-count-btn{flex:1;padding:15px 0;background:var(--card-soft);border:none;border-radius:var(--r-sm);color:var(--plum-soft);font-family:'Fredoka',sans-serif;font-size:1.15rem;font-weight:600;cursor:pointer;transition:all .18s}
+.team-count-btn.selected{background:var(--coral);color:#fff;box-shadow:0 6px 16px rgba(255,107,74,.4)}
+
+.team-names{display:flex;flex-direction:column;gap:9px;margin-top:13px}
+.team-input{background:var(--card-soft);border:2px solid transparent;border-radius:var(--r-sm);padding:13px 15px;color:var(--text);font-family:'Assistant',sans-serif;font-size:1rem;font-weight:600;width:100%;transition:border-color .2s}
+.team-input:focus{outline:none;border-color:var(--coral);background:#fff}
+
+/* ── rounds stepper ── */
+.stepper{display:flex;align-items:center;justify-content:space-between;background:var(--card-soft);border-radius:var(--r-sm);padding:6px}
+.step-btn{width:46px;height:46px;border:none;background:#fff;color:var(--coral);font-size:1.5rem;font-weight:700;cursor:pointer;border-radius:11px;box-shadow:0 3px 8px rgba(196,69,105,.12);transition:transform .12s}
+.step-btn:active{transform:scale(.9)}
+#rounds-display{font-family:'Fredoka',sans-serif;font-size:1.6rem;font-weight:700;color:var(--coral)}
+
+/* ════════ GAME ════════ */
+.game-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0 12px}
+.round-pill{background:rgba(255,255,255,.25);backdrop-filter:blur(4px);border-radius:14px;padding:7px 14px;font-family:'Fredoka',sans-serif;font-size:.85rem;font-weight:600;color:#fff}
+.genre-pill{background:#fff;border-radius:14px;padding:7px 14px;font-size:.82rem;font-weight:700;color:var(--coral);box-shadow:var(--shadow)}
+
+.progress-track{height:8px;background:rgba(255,255,255,.3);border-radius:5px;overflow:hidden;margin-bottom:14px}
+.progress-fill{height:100%;width:0;background:#fff;border-radius:5px;transition:width .5s ease;box-shadow:0 0 10px rgba(255,255,255,.6)}
+
+/* scores strip */
+.mini-scores{display:flex;gap:9px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
 .mini-scores::-webkit-scrollbar{display:none}
-.chip{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.8rem;display:flex;align-items:center;gap:6px}
-.chip-name{font-weight:600}.chip-pts{color:var(--accent2);font-weight:700;font-family:'Space Grotesk',sans-serif}
-.art-zone{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.vinyl{width:150px;height:150px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:conic-gradient(#1a1a1a 0deg,#2a2a2a 12deg,#1a1a1a 24deg,#2a2a2a 36deg,#111 60deg,#222 72deg,#111 84deg,#1a1a1a 96deg,#111 108deg,#222 120deg,#111 132deg,#1a1a1a 144deg,#111 180deg,#222 192deg,#111 240deg,#1a1a1a 252deg,#111 300deg,#1a1a1a 360deg);border:3px solid #333;box-shadow:0 0 0 8px #1a1a1a,0 0 0 9px #333,0 12px 40px rgba(0,0,0,.6)}
-.vinyl-dot{width:36px;height:36px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--glow);z-index:1;flex-shrink:0;transition:opacity .3s}
-.vinyl.spin{animation:vspin 2.5s linear infinite}
-@keyframes vspin{to{transform:rotate(360deg)}}
-.vinyl-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;opacity:0;transition:opacity .5s;font-size:3.5rem}
-.vinyl.show-art .vinyl-art{opacity:1}.vinyl.show-art .vinyl-dot{opacity:0}
-.snippet-info{font-size:.78rem;color:var(--accent2);font-weight:600;min-height:18px}
-.song-lbl{text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;min-height:42px}
+.chip{flex-shrink:0;background:#fff;border-radius:16px;padding:8px 15px;font-size:.85rem;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);transition:transform .2s}
+.chip-name{font-family:'Fredoka',sans-serif;font-weight:600;color:var(--text)}
+.chip-pts{font-family:'Fredoka',sans-serif;font-weight:700;color:var(--coral);font-size:1rem}
+
+/* play stage */
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:8px 0}
+
+/* the signature disc */
+.vinyl{width:190px;height:190px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;
+  background:radial-gradient(circle at 50% 40%,#FFE08A 0%,#FFAE63 35%,#FF6B4A 65%,#C44569 100%);
+  box-shadow:0 14px 44px rgba(196,69,105,.4),inset 0 -8px 20px rgba(196,69,105,.3),inset 0 8px 20px rgba(255,255,255,.4)}
+.vinyl::before{content:'';position:absolute;inset:0;border-radius:50%;border:5px solid rgba(255,255,255,.35)}
+.vinyl-dot{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 4px 14px rgba(196,69,105,.35);z-index:2;display:flex;align-items:center;justify-content:center;font-size:1.6rem;transition:opacity .3s}
+.vinyl-dot::after{content:'🎵'}
+.vinyl.spin{animation:discSpin 2.4s linear infinite}
+@keyframes discSpin{to{transform:rotate(360deg)}}
+/* pulsing rings while playing */
+.vinyl.spin::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 0 rgba(255,255,255,.5);animation:pulseRing 1.6s ease-out infinite}
+@keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(255,255,255,.55)}100%{box-shadow:0 0 0 30px rgba(255,255,255,0)}}
+.vinyl-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;opacity:0;transition:opacity .5s;font-size:3.6rem}
+.vinyl.show-art .vinyl-art{opacity:1}
+.vinyl.show-art .vinyl-dot{opacity:0}
+
+.snippet-info{font-family:'Fredoka',sans-serif;font-size:.82rem;color:#fff;font-weight:600;min-height:18px;background:rgba(255,255,255,.2);padding:4px 12px;border-radius:10px;backdrop-filter:blur(4px)}
+.snippet-info:empty{background:none;padding:0}
+
+.song-lbl{text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;min-height:48px}
 .song-lbl.show{opacity:1}
-.song-lbl .st{font-size:1.1rem;font-weight:700;line-height:1.3}
-.song-lbl .sa{color:var(--muted);font-size:.85rem;margin-top:3px}
-.ctrl-row{display:flex;align-items:center;justify-content:center;gap:22px}
-.play-btn{width:70px;height:70px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1.6rem;cursor:pointer;box-shadow:0 0 28px var(--glow);transition:transform .15s,opacity .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
-.play-btn:active{transform:scale(.93)}
-.play-btn:disabled{opacity:.35;cursor:default}
-.play-btn .pb-sub{font-size:.5rem;font-weight:600;margin-top:2px}
-.ring{position:relative;width:80px;height:80px}
+.song-lbl .st{font-family:'Fredoka',sans-serif;font-size:1.25rem;font-weight:700;color:#fff;text-shadow:0 2px 10px rgba(196,69,105,.35);line-height:1.25}
+.song-lbl .sa{color:rgba(255,255,255,.9);font-size:.9rem;font-weight:600;margin-top:3px}
+
+/* controls */
+.ctrl-row{display:flex;align-items:center;justify-content:center;gap:24px}
+.play-btn{width:84px;height:84px;border-radius:50%;border:none;background:#fff;color:var(--coral);cursor:pointer;box-shadow:var(--shadow-lg);transition:transform .15s,opacity .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.play-btn>span:first-child{font-size:2rem}
+.play-btn:active{transform:scale(.92)}
+.play-btn:disabled{opacity:.5;cursor:default}
+.play-btn .pb-sub{font-size:.52rem;font-weight:700;font-family:'Fredoka',sans-serif;margin-top:3px;color:var(--magenta)}
+
+.ring{position:relative;width:84px;height:84px}
 .ring svg{transform:rotate(-90deg)}
-.ring-track{fill:none;stroke:var(--border);stroke-width:5}
-.ring-bar{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;stroke-dasharray:226;stroke-dashoffset:0;transition:stroke .4s}
-.ring-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700}
-.hint{color:var(--muted);font-size:.82rem;text-align:center;padding:0 8px;min-height:18px}
-.buzz-grid{display:grid;gap:10px}
-.buzz-btn{padding:18px;border:none;border-radius:14px;font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:transform .12s,opacity .15s;color:#fff}
-.buzz-btn:active{transform:scale(.96)}
-.buzz-btn:disabled{opacity:.28;cursor:default}
-.tc0{background:linear-gradient(135deg,#7c3aed,#6366f1)}
-.tc1{background:linear-gradient(135deg,#f59e0b,#ef4444)}
-.tc2{background:linear-gradient(135deg,#22c55e,#16a34a)}
-.tc3{background:linear-gradient(135deg,#ec4899,#be185d)}
-.fb-overlay{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.82);z-index:9999;backdrop-filter:blur(8px)}
+.ring-track{fill:none;stroke:rgba(255,255,255,.3);stroke-width:6}
+.ring-bar{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;stroke-dasharray:238;stroke-dashoffset:0;transition:stroke .4s}
+.ring-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fredoka',sans-serif;font-size:1.7rem;font-weight:700;color:#fff}
+
+.hint{color:#fff;font-size:.9rem;font-weight:600;text-align:center;padding:0 10px;min-height:20px;text-shadow:0 1px 6px rgba(196,69,105,.3)}
+
+/* buzz buttons */
+.buzz-grid{display:grid;gap:11px}
+.buzz-btn{padding:19px;border:none;border-radius:var(--r-sm);font-family:'Fredoka',sans-serif;font-size:1.1rem;font-weight:600;cursor:pointer;transition:transform .12s,opacity .15s;color:#fff;box-shadow:var(--shadow)}
+.buzz-btn:active{transform:scale(.95)}
+.buzz-btn:disabled{opacity:.4;cursor:default}
+.tc0{background:linear-gradient(135deg,#FF6B4A,#C44569)}
+.tc1{background:linear-gradient(135deg,#FFC65C,#FF9558)}
+.tc2{background:linear-gradient(135deg,#5BC0BE,#3A9D9B)}
+.tc3{background:linear-gradient(135deg,#C44569,#7B3F61)}
+
+/* overlays */
+.fb-overlay{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(45,36,56,.6);z-index:999;backdrop-filter:blur(10px)}
 .fb-overlay.show{display:flex}
-.fb-box{text-align:center;animation:pop .3s cubic-bezier(.34,1.56,.64,1);padding:0 28px}
+.fb-box{text-align:center;animation:pop .35s cubic-bezier(.34,1.56,.64,1);padding:0 30px;background:#fff;margin:0 24px;padding:32px 28px;border-radius:28px;box-shadow:var(--shadow-lg)}
 @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-.fb-em{font-size:5rem;display:block}
-.fb-tt{font-size:1.7rem;font-weight:900;margin-top:8px}
-.fb-sg{color:var(--muted);font-size:.95rem;margin-top:8px;line-height:1.6}
-.win-card{text-align:center;padding:20px;background:linear-gradient(135deg,#1e153a,#1a0a2e);border:1px solid var(--accent);border-radius:var(--r);margin-bottom:20px}
-.win-em{font-size:3rem}.win-name{font-size:1.4rem;font-weight:900;color:var(--accent2);margin-top:4px}.win-sub{color:var(--muted);font-size:.85rem}
+.fb-em{font-size:4.5rem;display:block}
+.fb-tt{font-family:'Fredoka',sans-serif;font-size:1.6rem;font-weight:700;margin-top:8px;color:var(--text)}
+.fb-sg{color:var(--muted);font-size:.95rem;font-weight:600;margin-top:8px;line-height:1.5}
+
+/* judge overlay reuses fb-overlay; inline styled */
+
+/* ════════ SCOREBOARD ════════ */
+.score-hero{text-align:center;padding:10px 0 14px}
+.score-hero .logo-icon{font-size:3rem;display:block}
+.score-hero h1{font-size:1.7rem;color:#fff;text-shadow:0 3px 12px rgba(196,69,105,.35)}
+
+.win-card{text-align:center;padding:24px;background:#fff;border-radius:24px;box-shadow:var(--shadow-lg);margin-bottom:16px}
+.win-em{font-size:3.2rem}
+.win-name{font-family:'Fredoka',sans-serif;font-size:1.5rem;font-weight:700;color:var(--coral);margin-top:4px}
+.win-sub{color:var(--muted);font-size:.9rem;font-weight:600;margin-top:2px}
+
 .score-list{display:flex;flex-direction:column;gap:10px}
-.score-row{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
-.score-rank{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:var(--muted);width:28px}
-.score-rank.gold{color:#fbbf24}.score-rank.silver{color:#94a3b8}.score-rank.bronze{color:#b45309}
-.score-name{flex:1;font-weight:600}.score-pts{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:var(--accent2)}
-.hist-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
-.hist-num{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--muted);width:24px;text-align:center}
-.hist-info{flex:1}.hist-t{font-weight:600;font-size:.9rem}.hist-s{font-size:.8rem;color:var(--muted)}
-.back-btn{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:8px}
-.scroll{overflow-y:auto;flex:1}
-.flex-row{display:flex;gap:10px}.flex-1{flex:1}
-/* editor */
-.editor-genre-sel{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.score-row{display:flex;align-items:center;gap:14px;background:#fff;border-radius:var(--r-sm);padding:15px 17px;box-shadow:var(--shadow)}
+.score-rank{font-family:'Fredoka',sans-serif;font-size:1.4rem;font-weight:700;color:var(--muted);width:30px;text-align:center}
+.score-rank.gold{color:#FFB02E}.score-rank.silver{color:#A8B4C0}.score-rank.bronze{color:#CD7F4D}
+.score-name{flex:1;font-family:'Fredoka',sans-serif;font-weight:600;color:var(--text)}
+.score-pts{font-family:'Fredoka',sans-serif;font-size:1.4rem;font-weight:700;color:var(--coral)}
+
+.stat-line{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.92);border-radius:var(--r-sm);padding:13px 16px;margin-bottom:9px;font-size:.92rem;font-weight:600;box-shadow:var(--shadow)}
+.stat-line b{color:var(--coral);font-family:'Fredoka',sans-serif}
+.section-title{font-family:'Fredoka',sans-serif;font-size:.95rem;font-weight:600;color:#fff;margin-bottom:11px;text-shadow:0 1px 6px rgba(196,69,105,.3)}
+
+/* ════════ EDITOR ════════ */
+.editor-genre-sel{display:flex;gap:9px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
 .editor-genre-sel::-webkit-scrollbar{display:none}
-.eg-btn{flex-shrink:0;background:var(--card);border:2px solid var(--border);border-radius:20px;padding:8px 14px;font-size:.85rem;color:var(--text);cursor:pointer;font-family:'Heebo',sans-serif;white-space:nowrap}
-.eg-btn.sel{border-color:var(--accent);background:#1e153a}
-.song-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px}
-.song-item img{width:42px;height:42px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#000}
+.eg-btn{flex-shrink:0;background:rgba(255,255,255,.3);border:none;border-radius:14px;padding:9px 15px;font-family:'Fredoka',sans-serif;font-size:.85rem;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap;backdrop-filter:blur(4px);transition:all .2s}
+.eg-btn.sel{background:#fff;color:var(--coral);box-shadow:var(--shadow)}
+
+.add-box{background:#fff;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.add-box .tip{font-size:.78rem;color:var(--plum-soft);line-height:1.55;margin-bottom:11px}
+.add-box input{background:var(--card-soft);border:2px solid transparent;border-radius:var(--r-sm);padding:12px 14px;color:var(--text);font-family:'Assistant',sans-serif;font-size:.92rem;font-weight:600;width:100%;margin-bottom:9px}
+.add-box input:focus{outline:none;border-color:var(--coral);background:#fff}
+
+.song-item{display:flex;align-items:center;gap:11px;background:#fff;border-radius:var(--r-sm);padding:11px 13px;margin-bottom:9px;box-shadow:var(--shadow)}
+.song-item img{width:44px;height:44px;border-radius:11px;object-fit:cover;flex-shrink:0;background:var(--card-soft)}
 .song-item .si-info{flex:1;min-width:0}
-.song-item .si-t{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.song-item .si-a{font-size:.75rem;color:var(--muted)}
-.song-item .si-del{background:none;border:none;color:var(--red,#ef4444);font-size:1.2rem;cursor:pointer;padding:4px 8px;flex-shrink:0}
-.add-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px}
-.add-box input{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--text);font-family:'Heebo',sans-serif;font-size:.9rem;width:100%;margin-bottom:8px}
-.add-box input:focus{outline:none;border-color:var(--accent)}
-.tip{font-size:.75rem;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.song-item .si-t{font-family:'Fredoka',sans-serif;font-weight:600;font-size:.9rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-item .si-a{font-size:.76rem;color:var(--muted);font-weight:600}
+.song-item .si-del{background:none;border:none;color:var(--magenta);font-size:1.2rem;cursor:pointer;padding:4px 8px;flex-shrink:0}
+
+/* history */
+.hist-row{display:flex;align-items:center;gap:12px;padding:13px;background:#fff;border-radius:var(--r-sm);margin-bottom:9px;box-shadow:var(--shadow)}
+.hist-num{font-family:'Fredoka',sans-serif;font-weight:700;color:var(--coral);width:26px;text-align:center;font-size:1.05rem}
+.hist-info{flex:1}.hist-t{font-family:'Fredoka',sans-serif;font-weight:600;font-size:.9rem;color:var(--text)}.hist-s{font-size:.8rem;color:var(--muted);font-weight:600}
+
+.flex-row{display:flex;gap:10px}.flex-1{flex:1}
+.spacer{flex:1}.gap-8{height:8px}.gap-16{height:16px}.gap-24{height:24px}
+
 #yt-host{position:fixed;width:200px;height:200px;top:-9999px;left:-9999px;opacity:.01;pointer-events:none}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important}
+}
 </style>
 </head>
 <body>
@@ -127,110 +251,144 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Heebo'
 
 <!-- HOME -->
 <div id="screen-home" class="screen active">
-  <div class="logo"><span class="logo-icon">🎵</span><h1>Beat Quiz</h1><p>זהה את השיר מ-3 שניות בלבד!</p></div>
-  <div class="spacer"></div>
-  <div style="display:flex;flex-direction:column;gap:12px;padding:8px 0 24px">
-    <button class="btn btn-primary" onclick="showScreen('setup')">🎮 משחק חדש</button>
-    <button class="btn btn-ghost" onclick="showScreen('editor')">🎵 ניהול שירים</button>
-    <button class="btn btn-ghost" onclick="showScreen('history')">📋 היסטוריית משחקים</button>
+  <div class="home-hero">
+    <div class="brand-mark">🎧</div>
+    <h1 class="display">Beat Quiz</h1>
+    <div class="tag">נחשו את השיר ב-3 שניות</div>
+  </div>
+  <div class="home-actions">
+    <button class="btn btn-primary" onclick="showScreen('setup')">▶ משחק חדש</button>
+    <button class="btn btn-white" onclick="showScreen('editor')">🎵 ניהול שירים</button>
+    <button class="btn btn-soft" onclick="showScreen('history')">📋 משחקים קודמים</button>
   </div>
 </div>
 
 <!-- SETUP -->
 <div id="screen-setup" class="screen">
-  <div style="display:flex;align-items:center;gap:12px;padding:12px 0 20px">
-    <button class="back-btn" onclick="showScreen('home')">←</button>
-    <h2 style="font-size:1.2rem;font-weight:700">הגדרות משחק</h2>
+  <div class="topbar">
+    <button class="icon-btn" onclick="showScreen('home')">→</button>
+    <h2>הגדרות משחק</h2>
   </div>
   <div class="scroll">
-    <div class="setup-section"><div class="section-title">🎸 סגנון מוסיקה</div><div class="genre-grid" id="genre-grid"></div></div>
-    <div class="setup-section"><div class="section-title">👥 מספר קבוצות</div>
-      <div class="team-count-row">
-        <button class="team-count-btn" onclick="setTC(1)">1</button>
-        <button class="team-count-btn selected" onclick="setTC(2)">2</button>
-        <button class="team-count-btn" onclick="setTC(3)">3</button>
-        <button class="team-count-btn" onclick="setTC(4)">4</button>
+    <div class="sheet">
+      <div class="setup-block">
+        <div class="label">🎸 סגנון מוסיקה</div>
+        <div class="genre-grid" id="genre-grid"></div>
       </div>
-      <div class="team-names" id="team-names"></div>
+      <div class="setup-block">
+        <div class="label">👥 מספר קבוצות</div>
+        <div class="seg-row">
+          <button class="team-count-btn" onclick="setTC(1)">1</button>
+          <button class="team-count-btn selected" onclick="setTC(2)">2</button>
+          <button class="team-count-btn" onclick="setTC(3)">3</button>
+          <button class="team-count-btn" onclick="setTC(4)">4</button>
+        </div>
+        <div class="team-names" id="team-names"></div>
+      </div>
+      <div class="setup-block" style="margin-bottom:0">
+        <div class="label">🔄 מספר סיבובים</div>
+        <div class="stepper">
+          <button class="step-btn" onclick="chRounds(-1)">−</button>
+          <span id="rounds-display">10</span>
+          <button class="step-btn" onclick="chRounds(+1)">+</button>
+        </div>
+      </div>
     </div>
-    <div class="setup-section"><div class="section-title">🔄 מספר סיבובים</div>
-      <div class="rounds-row"><button class="rounds-btn" onclick="chRounds(-1)">−</button><span id="rounds-display">10</span><button class="rounds-btn" onclick="chRounds(+1)">+</button></div>
-    </div>
-    <div class="gap-24"></div>
+    <div class="gap-16"></div>
   </div>
-  <button class="btn btn-primary" onclick="startGame()">🚀 התחל משחק!</button>
-  <div class="gap-16"></div>
+  <button class="btn btn-primary" onclick="startGame()">🚀 בואו נתחיל!</button>
+  <div class="gap-8"></div>
 </div>
 
 <!-- GAME -->
 <div id="screen-game" class="screen">
-  <div class="game-header"><span class="game-round" id="lbl-round"></span><span class="genre-tag" id="lbl-genre"></span><button class="back-btn" onclick="quitGame()">✕</button></div>
+  <div class="game-top">
+    <span class="round-pill" id="lbl-round"></span>
+    <span class="genre-pill" id="lbl-genre"></span>
+    <button class="icon-btn" onclick="quitGame()">✕</button>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-bar"></div></div>
   <div class="mini-scores" id="mini-scores"></div>
-  <div class="art-zone">
-    <div class="vinyl" id="vinyl"><div class="vinyl-art" id="vinyl-art">🎵</div><div class="vinyl-dot"></div></div>
+
+  <div class="stage">
+    <div class="vinyl" id="vinyl"><div class="vinyl-art" id="vinyl-art"></div><div class="vinyl-dot"></div></div>
     <div class="snippet-info" id="snippet-info"></div>
     <div class="song-lbl" id="song-lbl"><div class="st" id="lbl-title"></div><div class="sa" id="lbl-artist"></div></div>
     <div class="ctrl-row">
       <button class="play-btn" id="play-btn" onclick="onPlay()"><span>▶</span><span class="pb-sub" id="pb-sub">3 שניות</span></button>
-      <div class="ring"><svg viewBox="0 0 80 80" width="80" height="80"><circle class="ring-track" cx="40" cy="40" r="36"/><circle class="ring-bar" cx="40" cy="40" r="36" id="ring-bar"/></svg><div class="ring-lbl" id="ring-lbl">3</div></div>
+      <div class="ring"><svg viewBox="0 0 84 84" width="84" height="84"><circle class="ring-track" cx="42" cy="42" r="38"/><circle class="ring-bar" cx="42" cy="42" r="38" id="ring-bar"/></svg><div class="ring-lbl" id="ring-lbl">3</div></div>
     </div>
-    <div class="hint" id="hint">לחץ ▶ להשמיע 3 שניות</div>
+    <div class="hint" id="hint">לחצו ▶ להשמעת 3 שניות</div>
   </div>
+
   <div class="buzz-grid" id="buzz-grid"></div>
   <div class="gap-8"></div>
-  <button class="btn btn-ghost" id="skip-btn" onclick="onSkip()" style="margin-bottom:8px">⏭ דלג על השיר</button>
+  <button class="btn btn-soft" id="skip-btn" onclick="onSkip()" style="margin-bottom:6px">⏭ דלגו על השיר</button>
 </div>
 
 <!-- FEEDBACK -->
 <div class="fb-overlay" id="fb-overlay"><div class="fb-box"><span class="fb-em" id="fb-em"></span><div class="fb-tt" id="fb-tt"></div><div class="fb-sg" id="fb-sg"></div></div></div>
 
+<!-- JUDGE -->
+<div class="fb-overlay" id="judge-overlay"><div class="fb-box">
+  <div style="font-family:'Fredoka',sans-serif;font-size:1.35rem;font-weight:700;margin-bottom:4px;color:var(--text)">⏸️ <span id="judge-team"></span></div>
+  <div style="color:var(--coral);font-size:.95rem;font-weight:700;margin-bottom:22px" id="judge-pts"></div>
+  <div style="display:flex;gap:12px;justify-content:center">
+    <button class="btn btn-sm" style="background:#2EC27E;color:#fff;padding:14px 30px" onclick="judgeCorrect()">✅ נכון</button>
+    <button class="btn btn-sm" style="background:#FF5A5A;color:#fff;padding:14px 30px" onclick="judgeWrong()">❌ טעות</button>
+  </div>
+</div></div>
+
 <!-- SCOREBOARD -->
 <div id="screen-scoreboard" class="screen">
-  <div class="logo" style="padding-top:16px"><span class="logo-icon" style="font-size:3rem">🏆</span><h1 style="font-size:1.6rem">תוצאות</h1></div>
-  <div id="win-card" class="win-card"></div>
-  <div id="score-list" class="score-list"></div>
-  <div class="spacer"></div>
-  <div class="flex-row" style="padding:16px 0">
-    <button class="btn btn-ghost flex-1" onclick="goSetup()">🔄 משחק חדש</button>
-    <button class="btn btn-primary flex-1" onclick="showScreen('home')">🏠 בית</button>
+  <div class="score-hero">
+    <span class="logo-icon">🏆</span>
+    <h1 class="display">התוצאות</h1>
+  </div>
+  <div class="scroll">
+    <div id="win-card" class="win-card"></div>
+    <div id="score-list" class="score-list"></div>
+    <div id="stats-box" style="margin-top:18px"></div>
+  </div>
+  <div class="flex-row" style="padding:14px 0">
+    <button class="btn btn-soft flex-1" onclick="goSetup()">🔄 שוב</button>
+    <button class="btn btn-white flex-1" onclick="showScreen('home')">🏠 בית</button>
   </div>
 </div>
 
 <!-- EDITOR -->
 <div id="screen-editor" class="screen">
-  <div style="display:flex;align-items:center;gap:12px;padding:12px 0 16px">
-    <button class="back-btn" onclick="showScreen('home')">←</button>
-    <h2 style="font-size:1.2rem;font-weight:700">ניהול שירים</h2>
+  <div class="topbar">
+    <button class="icon-btn" onclick="showScreen('home')">→</button>
+    <h2>ניהול שירים</h2>
   </div>
   <div class="editor-genre-sel" id="editor-genre-sel"></div>
-
-  <div class="add-box" style="border-color:var(--accent)">
-    <div class="tip">🎵 <b>חיבור אוטומטי:</b> הדבק קישור לפלייליסט יוטיוב ציבורי. בכל משחק יימשכו ממנו שירים רנדומליים אוטומטית!</div>
-    <input id="playlist-link" placeholder="קישור פלייליסט יוטיוב (youtube.com/playlist?list=...)"/>
+  <div class="add-box" style="border:2px solid var(--gold)">
+    <div class="tip">🎵 <b>חיבור אוטומטי:</b> הדביקו קישור לפלייליסט יוטיוב ציבורי. בכל משחק יימשכו ממנו שירים אקראיים.</div>
+    <input id="playlist-link" placeholder="קישור פלייליסט יוטיוב"/>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-primary btn-sm" style="flex:1" onclick="savePlaylistForGenre()">💾 שמור פלייליסט</button>
-      <button class="btn btn-ghost btn-sm" onclick="testPlaylist()">🔍 בדוק</button>
+      <button class="btn btn-primary btn-sm" style="flex:1" onclick="savePlaylistForGenre()">💾 שמור</button>
+      <button class="btn btn-sm" style="background:var(--card-soft);color:var(--plum)" onclick="testPlaylist()">🔍 בדוק</button>
     </div>
-    <div id="playlist-status" style="font-size:.78rem;color:var(--muted);margin-top:8px;min-height:16px"></div>
+    <div id="playlist-status" style="font-size:.8rem;color:var(--muted);font-weight:600;margin-top:9px;min-height:16px"></div>
   </div>
-
   <div class="add-box">
-    <div class="tip">➕ <b>הוספה ידנית:</b> פתח שיר ביוטיוב, העתק את הקישור והזן שם.</div>
-    <input id="add-link" placeholder="קישור יוטיוב או מזהה (למשל mqvjNTx4gE4)"/>
+    <div class="tip">➕ <b>הוספה ידנית:</b> פתחו שיר ביוטיוב, העתיקו את הקישור והזינו שם.</div>
+    <input id="add-link" placeholder="קישור יוטיוב או מזהה"/>
     <input id="add-title" placeholder="שם השיר"/>
     <input id="add-artist" placeholder="שם האמן (לא חובה)"/>
-    <button class="btn btn-primary btn-sm" style="width:100%" onclick="addSong()">➕ הוסף שיר</button>
+    <button class="btn btn-primary btn-sm" style="width:100%" onclick="addSong()">➕ הוסיפו שיר</button>
   </div>
   <div class="scroll" id="song-list"></div>
 </div>
 
 <!-- HISTORY -->
 <div id="screen-history" class="screen">
-  <div style="display:flex;align-items:center;gap:12px;padding:12px 0 20px">
-    <button class="back-btn" onclick="showScreen('home')">←</button>
-    <h2 style="font-size:1.2rem;font-weight:700">היסטוריית משחקים</h2>
+  <div class="topbar">
+    <button class="icon-btn" onclick="showScreen('home')">→</button>
+    <h2>משחקים קודמים</h2>
     <div class="spacer"></div>
-    <button class="btn btn-ghost btn-sm" onclick="clearHist()">מחק הכל</button>
+    <button class="btn btn-soft btn-sm" onclick="clearHist()">מחק</button>
   </div>
   <div class="scroll" id="hist-content"></div>
 </div>
@@ -331,14 +489,30 @@ async function fetchPlaylist(playlistId){
 }
 
 
-// load DB (merge defaults + user additions from localStorage)
+// ── אבטחה: helpers ──────────────────────────
+function escapeHtml(str=''){
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function sanitizeTeamName(name=''){
+  return String(name).trim().substring(0,20);
+}
+function deepClone(o){ return (typeof structuredClone==='function')?structuredClone(o):JSON.parse(JSON.stringify(o)); }
+
+// load DB (defaults + user additions) with validation
 let DB=loadDB();
 function loadDB(){
-  const saved=localStorage.getItem('bq_songs');
-  if(saved){try{return JSON.parse(saved);}catch(e){}}
-  return JSON.parse(JSON.stringify(DEFAULT_DB));
+  try{
+    const saved=localStorage.getItem('bq_songs');
+    if(saved){
+      const parsed=JSON.parse(saved);
+      if(parsed && typeof parsed==='object' && !Array.isArray(parsed)) return parsed;
+    }
+  }catch(err){console.error('loadDB:',err);}
+  return deepClone(DEFAULT_DB);
 }
-function saveDB(){localStorage.setItem('bq_songs',JSON.stringify(DB));}
+function saveDB(){try{localStorage.setItem('bq_songs',JSON.stringify(DB));}catch(e){console.error(e);}}
 
 const SNIP_MS=3000,FB_MS=1800,CIRC=226;
 const TC=['tc0','tc1','tc2','tc3'],RANKS=['gold','silver','bronze'],MEDALS=['🥇','🥈','🥉'];
@@ -346,6 +520,10 @@ const G={genre:null,teams:['קבוצה א','קבוצה ב'],teamCnt:2,rounds:10,
   phase:'init',timerInt:null,snippetTO:null,yt:null,ytReady:false,startWatchdog:null,fallbackTO:null,
   segment:0, /* which 3-sec chunk: 0=0-3, 1=3-6, ... */
   loadedId:null, /* currently cued video id */
+  randomStart:0, /* random offset into the song */
+  stealUsed:false, /* whether steal already happened this round */
+  buzzedTeam:-1, pendingPts:0,
+  roundStats:[], /* per-round: {song, segments, winner} */
   editGenre:'festigal'};
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');if(id==='history')renderHistory();if(id==='editor')buildEditor();}
@@ -360,7 +538,7 @@ function buildSetup(){
 }
 function selGenre(id){G.genre=id;document.querySelectorAll('.genre-card').forEach((c,i)=>c.classList.toggle('selected',GENRES[i].id===id));}
 function setTC(n){G.teamCnt=n;while(G.teams.length<n)G.teams.push('קבוצה '+'אבגד'[G.teams.length]);document.querySelectorAll('.team-count-btn').forEach((b,i)=>b.classList.toggle('selected',i+1===n));renderTeams();}
-function renderTeams(){const c=document.getElementById('team-names');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const inp=document.createElement('input');inp.type='text';inp.className='team-input';inp.placeholder='שם קבוצה '+(i+1);inp.value=G.teams[i]||'';inp.addEventListener('input',e=>G.teams[i]=e.target.value||('קבוצה '+(i+1)));c.appendChild(inp);}}
+function renderTeams(){const c=document.getElementById('team-names');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const inp=document.createElement('input');inp.type='text';inp.className='team-input';inp.maxLength=20;inp.placeholder='שם קבוצה '+(i+1);inp.value=G.teams[i]||'';inp.addEventListener('input',e=>G.teams[i]=sanitizeTeamName(e.target.value)||('קבוצה '+(i+1)));c.appendChild(inp);}}
 function chRounds(d){G.rounds=Math.max(5,Math.min(30,G.rounds+d));document.getElementById('rounds-display').textContent=G.rounds;}
 
 // ── EDITOR ───────────────────────────────────
@@ -396,7 +574,8 @@ function renderSongList(){
   c.innerHTML='';
   songs.forEach((s,i)=>{
     const d=document.createElement('div');d.className='song-item';
-    d.innerHTML=`<img src="https://img.youtube.com/vi/${s.id}/default.jpg" onerror="this.style.opacity=.2"/><div class="si-info"><div class="si-t">${s.t}</div><div class="si-a">${s.a||''}</div></div><button class="si-del" onclick="delSong(${i})">🗑️</button>`;
+    const safeId=encodeURIComponent(s.id);
+    d.innerHTML=`<img src="https://img.youtube.com/vi/${safeId}/default.jpg" onerror="this.style.opacity=.2"/><div class="si-info"><div class="si-t">${escapeHtml(s.t)}</div><div class="si-a">${escapeHtml(s.a||'')}</div></div><button class="si-del" onclick="delSong(${i})">🗑️</button>`;
     c.appendChild(d);
   });
 }
@@ -458,8 +637,8 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);
 // ── GAME ─────────────────────────────────────
 async function startGame(){
   if(!G.genre){alert('אנא בחר סגנון מוסיקה');return;}
-  for(let i=0;i<G.teamCnt;i++)if(!G.teams[i])G.teams[i]='קבוצה '+(i+1);
-  G.scores=Array(G.teamCnt).fill(0);G.round=0;G.idx=0;
+  for(let i=0;i<G.teamCnt;i++)G.teams[i]=sanitizeTeamName(G.teams[i])||('קבוצה '+(i+1));
+  G.scores=Array(G.teamCnt).fill(0);G.round=0;G.idx=0;G.roundStats=[];
 
   showScreen('game');buildBuzz();buildChips();
   const g=GENRES.find(x=>x.id===G.genre);document.getElementById('lbl-genre').textContent=g.e+' '+g.n;
@@ -487,23 +666,42 @@ async function startGame(){
     return;
   }
 
-  let list=shuffle([...pool]);
-  while(list.length<G.rounds+2)list=[...list,...shuffle([...pool])];
-  G.songs=list;
+  // מניעת שירים כפולים: אם אין מספיק שירים, מקצרים את מספר הסיבובים
+  const unique=shuffle([...pool]);
+  if(unique.length<G.rounds){
+    if(!confirm(`יש רק ${unique.length} שירים בקטגוריה זו (ביקשת ${G.rounds} סיבובים).\nלשחק ${unique.length} סיבובים ללא חזרות?`)){
+      setHint('הוסף עוד שירים או הקטן את מספר הסיבובים');
+      setPBtn(true);
+      return;
+    }
+    G.rounds=unique.length;
+  }
+  G.songs=unique; // each song appears once, no duplicates
   loadRound();
 }
 
 function loadRound(){
-  G.phase='idle';G.segment=0;G.loadedId=null;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
+  G.phase='idle';G.segment=0;G.loadedId=null;G.stealUsed=false;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
   const s=cur();
+  // התחלה רנדומלית בשיר (20-80 שניות) כדי לא להתחיל תמיד באינטרו
+  G.randomStart=Math.floor(Math.random()*60)+20;
   document.getElementById('lbl-round').textContent=`סיבוב ${G.round+1} / ${G.rounds}`;
+  updateProgress();
   document.getElementById('lbl-title').textContent=s.t;document.getElementById('lbl-artist').textContent=s.a;
   document.getElementById('song-lbl').classList.remove('show');
-  const va=document.getElementById('vinyl-art');va.style.backgroundImage=`url(https://img.youtube.com/vi/${s.id}/mqdefault.jpg)`;va.textContent='';
+  const va=document.getElementById('vinyl-art');va.style.backgroundImage=`url(https://img.youtube.com/vi/${encodeURIComponent(s.id)}/mqdefault.jpg)`;va.textContent='';
   setVinyl('idle');resetRing();setPBtn(false);setBuzz(false);
   document.getElementById('snippet-info').textContent='';
   document.getElementById('pb-sub').textContent='3 שניות';
   setHint(G.ytReady?'לחץ ▶ להשמיע 3 שניות':'⏳ טוען נגן...');
+  // טעינה מוקדמת (cue) לטעינה מהירה יותר כשלוחצים Play
+  if(G.ytReady){try{G.yt.cueVideoById({videoId:s.id,startSeconds:G.randomStart});G.loadedId=s.id;}catch(e){}}
+}
+
+function updateProgress(){
+  const pct=Math.round((G.round/G.rounds)*100);
+  const bar=document.getElementById('progress-bar');
+  if(bar)bar.style.width=pct+'%';
 }
 
 // ── ACCUMULATIVE PLAY ────────────────────────
@@ -514,11 +712,10 @@ function onPlay(){
   // allowed in 'idle' (first play) OR 'guessing' (next segment)
   setBuzz(false);                            // disable buzz while a new segment plays
   const s=cur();
-  const startSec=G.segment*3;       // 0, 3, 6, 9...
-  const endSec=startSec+3;
+  const startSec=G.randomStart + (G.segment*3);   // random offset + accumulated segments
   G.phase='playing';setPBtn(true);
-  setHint(`⏳ טוען... (שניות ${startSec}-${endSec})`);
-  document.getElementById('snippet-info').textContent=`▶ קטע ${G.segment+1} · שניות ${startSec}–${endSec}`;
+  setHint(`⏳ טוען...`);
+  document.getElementById('snippet-info').textContent=`▶ קטע ${G.segment+1} · ${(G.segment+1)*3} שניות`;
   try{
     if(G.loadedId!==s.id){
       G.loadedId=s.id;
@@ -547,18 +744,91 @@ function snippetDone(){
   if(G.phase!=='playing')return;
   G.phase='guessing';clearTimers();
   if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
-  setVinyl('idle');setRingEmpty();setBuzz(true);
+  setVinyl('idle');setRingEmpty();
+  // re-enable buzz — but if a steal is active, keep the wrong team locked out
+  if(G.stealUsed && G.buzzedTeam>=0){
+    document.querySelectorAll('.buzz-btn').forEach((b,idx)=>{b.disabled=(idx===G.buzzedTeam);});
+  }else{
+    setBuzz(true);
+  }
   G.segment++; // next press plays next 3 seconds
   setPBtn(false);
   document.getElementById('pb-sub').textContent=`עוד 3 שניות`;
   setHint('נחשו ולחצו על הקבוצה 👇  או ▶ לעוד 3 שניות');
 }
 
-function buzz(i){if(G.phase!=='guessing')return;G.phase='done';setBuzz(false);if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}reveal();G.scores[i]++;updChips();showFB(true,G.teams[i],cur());setTimeout(nextRound,FB_MS+400);}
-function onSkip(){if(G.phase==='done')return;G.phase='done';clearTimers();setBuzz(false);if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}const song=cur();reveal();showFB(false,null,song);setTimeout(nextRound,FB_MS+400);}
+// ── BUZZ → JUDGE (correct/wrong) → STEAL ─────
+function dynamicPoints(){
+  // G.segment = כמה קטעים כבר נוגנו (1 אחרי הקטע הראשון)
+  // קטע 1 (3 שניות) = 3 נק' · קטע 2 (6 שניות) = 2 · קטע 3+ = 1
+  return G.segment<=1 ? 3 : G.segment<=2 ? 2 : 1;
+}
+
+function buzz(i){
+  if(G.phase!=='guessing')return;
+  G.phase='judging';
+  G.buzzedTeam=i;
+  setBuzz(false);
+  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
+  clearTimers();
+  openJudge(i);
+}
+
+function openJudge(teamIdx){
+  const pts=dynamicPoints();
+  document.getElementById('judge-team').textContent=G.teams[teamIdx];
+  document.getElementById('judge-pts').textContent=`${pts} נקודות אם נכון`;
+  document.getElementById('judge-overlay').classList.add('show');
+  G.pendingPts=pts;
+}
+
+function judgeCorrect(){
+  const i=G.buzzedTeam;
+  document.getElementById('judge-overlay').classList.remove('show');
+  G.scores[i]+=G.pendingPts;
+  updChips();
+  recordStat(i);
+  G.phase='done';
+  reveal();
+  showFB(true,G.teams[i],cur(),G.pendingPts);
+  setTimeout(nextRound,FB_MS+400);
+}
+
+function judgeWrong(){
+  document.getElementById('judge-overlay').classList.remove('show');
+  const wrongTeam=G.buzzedTeam;
+  // גניבת תשובה — אם יש יותר מקבוצה אחת ועוד לא נוצלה גניבה
+  if(G.teamCnt>1 && !G.stealUsed){
+    G.stealUsed=true;
+    G.phase='guessing';
+    setHint(`❌ ${G.teams[wrongTeam]} טעו! קבוצה אחרת יכולה לגנוב 🥷`);
+    // enable buzz for everyone EXCEPT the team that just answered wrong
+    document.querySelectorAll('.buzz-btn').forEach((b,idx)=>{b.disabled=(idx===wrongTeam);});
+    setPBtn(false); // still allow more seconds
+  }else{
+    // אין גניבה — חושפים ועוברים
+    G.phase='done';
+    reveal();
+    showFB(false,null,cur(),0);
+    setTimeout(nextRound,FB_MS+400);
+  }
+}
+
+function recordStat(winnerIdx){
+  G.roundStats.push({song:cur(),segments:Math.max(1,G.segment),winner:winnerIdx});
+}
+
+function onSkip(){
+  if(G.phase==='done'||G.phase==='judging')return;
+  G.phase='done';clearTimers();setBuzz(false);
+  if(G.ytReady){try{G.yt.pauseVideo();}catch(e){}}
+  G.roundStats.push({song:cur(),segments:Math.max(1,G.segment),winner:-1});
+  reveal();showFB(false,null,cur(),0);
+  setTimeout(nextRound,FB_MS+400);
+}
 function reveal(){setVinyl('art');document.getElementById('song-lbl').classList.add('show');}
 function nextRound(){G.round++;G.idx++;if(G.round>=G.rounds){finish();return;}loadRound();}
-function showFB(ok,team,song){document.getElementById('fb-em').textContent=ok?'✅':'⏭';document.getElementById('fb-tt').textContent=ok?`${team} ענו נכון! 🎉`:'דילוג...';document.getElementById('fb-sg').textContent=`♪ ${song.t}${song.a?' — '+song.a:''}`;const o=document.getElementById('fb-overlay');o.classList.add('show');setTimeout(()=>o.classList.remove('show'),FB_MS);}
+function showFB(ok,team,song,pts){document.getElementById('fb-em').textContent=ok?'✅':'⏭';document.getElementById('fb-tt').textContent=ok?`${escapeHtml(team)} +${pts} 🎉`:'דילוג...';document.getElementById('fb-sg').textContent=`♪ ${song.t}${song.a?' — '+song.a:''}`;const o=document.getElementById('fb-overlay');o.classList.add('show');setTimeout(()=>o.classList.remove('show'),FB_MS);}
 function clearTimers(){clearInterval(G.timerInt);G.timerInt=null;clearTimeout(G.snippetTO);clearTimeout(G.startWatchdog);clearTimeout(G.fallbackTO);}
 function startRing(){resetRing();let t=0;const tick=80;G.timerInt=setInterval(()=>{t+=tick;const f=Math.min(1,t/SNIP_MS);document.getElementById('ring-bar').style.strokeDashoffset=CIRC*f;document.getElementById('ring-lbl').textContent=Math.max(0,Math.ceil((SNIP_MS-t)/1000));document.getElementById('ring-bar').style.stroke=f>.66?'#ef4444':f>.33?'#f59e0b':'var(--accent)';},tick);}
 function resetRing(){clearInterval(G.timerInt);G.timerInt=null;document.getElementById('ring-lbl').textContent='3';document.getElementById('ring-bar').style.strokeDashoffset=0;document.getElementById('ring-bar').style.stroke='var(--accent)';}
@@ -568,11 +838,55 @@ function cur(){return G.songs[G.idx%G.songs.length];}
 function setHint(t){document.getElementById('hint').textContent=t;}
 function setPBtn(d){const b=document.getElementById('play-btn');b.disabled=d;}
 function setBuzz(on){document.querySelectorAll('.buzz-btn').forEach(b=>b.disabled=!on);}
-function updChips(){for(let i=0;i<G.teamCnt;i++)document.getElementById('cpts'+i).textContent=G.scores[i];}
+function updChips(){
+  const max=Math.max(...G.scores);
+  for(let i=0;i<G.teamCnt;i++){
+    document.getElementById('cpts'+i).textContent=G.scores[i];
+    const chip=document.getElementById('chip'+i);
+    if(chip){
+      const leading=G.scores[i]===max && max>0;
+      chip.style.borderColor=leading?'var(--accent)':'var(--border)';
+      chip.style.background=leading?'#1e153a':'var(--card)';
+      const nm=chip.querySelector('.chip-name');
+      if(nm)nm.textContent=(leading?'👑 ':'')+G.teams[i];
+    }
+  }
+}
 function buildBuzz(){const g=document.getElementById('buzz-grid');g.innerHTML='';g.style.gridTemplateColumns='1fr 1fr';for(let i=0;i<G.teamCnt;i++){const b=document.createElement('button');b.className=`buzz-btn ${TC[i]}`;b.textContent=G.teams[i];b.disabled=true;b.onclick=()=>buzz(i);g.appendChild(b);}}
-function buildChips(){const c=document.getElementById('mini-scores');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const ch=document.createElement('div');ch.className='chip';ch.innerHTML=`<span class="chip-name">${G.teams[i]}</span><span class="chip-pts" id="cpts${i}">0</span>`;c.appendChild(ch);}}
-function quitGame(){if(G.round>0&&!confirm('לצאת מהמשחק?'))return;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}G.phase='idle';showScreen('home');}
-function finish(){if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}const hist=JSON.parse(localStorage.getItem('bq')||'[]');hist.unshift({date:new Date().toLocaleDateString('he-IL'),genre:GENRES.find(x=>x.id===G.genre)?.n,teams:G.teams.slice(0,G.teamCnt),scores:G.scores.slice(0,G.teamCnt)});localStorage.setItem('bq',JSON.stringify(hist.slice(0,20)));const s=G.teams.slice(0,G.teamCnt).map((n,i)=>({n,p:G.scores[i]})).sort((a,b)=>b.p-a.p);document.getElementById('win-card').innerHTML=`<div class="win-em">🏆</div><div class="win-name">${s[0].n}</div><div class="win-sub">${s[0].p} נקודות · ${GENRES.find(x=>x.id===G.genre)?.n}</div>`;const l=document.getElementById('score-list');l.innerHTML='';s.forEach((t,r)=>{const row=document.createElement('div');row.className='score-row';row.innerHTML=`<div class="score-rank ${RANKS[r]||''}">${MEDALS[r]||r+1}</div><div class="score-name">${t.n}</div><div class="score-pts">${t.p}</div>`;l.appendChild(row);});showScreen('scoreboard');}
+function buildChips(){const c=document.getElementById('mini-scores');c.innerHTML='';for(let i=0;i<G.teamCnt;i++){const ch=document.createElement('div');ch.className='chip';ch.id='chip'+i;ch.innerHTML=`<span class="chip-name">${escapeHtml(G.teams[i])}</span><span class="chip-pts" id="cpts${i}">0</span>`;c.appendChild(ch);}}
+function quitGame(){if(G.round>0&&!confirm('לצאת מהמשחק?'))return;clearTimers();if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}G.phase='idle';document.getElementById('judge-overlay').classList.remove('show');document.getElementById('fb-overlay').classList.remove('show');showScreen('home');}
+function finish(){
+  if(G.ytReady){try{G.yt.stopVideo();}catch(e){}}
+  const hist=JSON.parse(localStorage.getItem('bq')||'[]');
+  hist.unshift({date:new Date().toLocaleDateString('he-IL'),genre:GENRES.find(x=>x.id===G.genre)?.n,teams:G.teams.slice(0,G.teamCnt),scores:G.scores.slice(0,G.teamCnt)});
+  localStorage.setItem('bq',JSON.stringify(hist.slice(0,20)));
+  const s=G.teams.slice(0,G.teamCnt).map((n,i)=>({n,p:G.scores[i]})).sort((a,b)=>b.p-a.p);
+  document.getElementById('win-card').innerHTML=`<div class="win-em">🏆</div><div class="win-name">${escapeHtml(s[0].n)}</div><div class="win-sub">${s[0].p} נקודות · ${escapeHtml(GENRES.find(x=>x.id===G.genre)?.n||'')}</div>`;
+  const l=document.getElementById('score-list');l.innerHTML='';
+  s.forEach((t,r)=>{const row=document.createElement('div');row.className='score-row';row.innerHTML=`<div class="score-rank ${RANKS[r]||''}">${MEDALS[r]||r+1}</div><div class="score-name">${escapeHtml(t.n)}</div><div class="score-pts">${t.p}</div>`;l.appendChild(row);});
+  renderStats();
+  showScreen('scoreboard');
+}
+function renderStats(){
+  const box=document.getElementById('stats-box');
+  if(!box)return;
+  const answered=G.roundStats.filter(r=>r.winner>=0);
+  const skipped=G.roundStats.filter(r=>r.winner<0);
+  if(!G.roundStats.length){box.innerHTML='';return;}
+  let easiest=null,hardest=null;
+  answered.forEach(r=>{
+    if(!easiest||r.segments<easiest.segments)easiest=r;
+    if(!hardest||r.segments>hardest.segments)hardest=r;
+  });
+  const successPct=Math.round((answered.length/G.roundStats.length)*100);
+  let html=`<div class="section-title" style="margin-top:8px">📊 סטטיסטיקות</div>`;
+  html+=`<div class="stat-line"><span>תשובות נכונות</span><b>${answered.length}/${G.roundStats.length}</b></div>`;
+  html+=`<div class="stat-line"><span>אחוז הצלחה</span><b>${successPct}%</b></div>`;
+  if(skipped.length)html+=`<div class="stat-line"><span>דילוגים</span><b>${skipped.length}</b></div>`;
+  if(easiest)html+=`<div class="stat-line"><span>🟢 הכי קל</span><b>${escapeHtml(easiest.song.t)}</b></div>`;
+  if(hardest&&hardest!==easiest)html+=`<div class="stat-line"><span>🔴 הכי קשה</span><b>${escapeHtml(hardest.song.t)}</b></div>`;
+  box.innerHTML=html;
+}
 function renderHistory(){const c=document.getElementById('hist-content');const h=JSON.parse(localStorage.getItem('bq')||'[]');if(!h.length){c.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px 0">אין עדיין משחקים</p>';return;}c.innerHTML=h.map((x,i)=>{const w=x.teams.map((n,j)=>({n,s:x.scores[j]})).sort((a,b)=>b.s-a.s)[0];return `<div class="hist-row"><div class="hist-num">${i+1}</div><div class="hist-info"><div class="hist-t">${x.genre} · ${x.date}</div><div class="hist-s">${x.teams.map((n,j)=>n+': '+x.scores[j]).join(' | ')}</div></div><span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:.75rem;font-weight:600">🏆 ${w.n}</span></div>`;}).join('');}
 function clearHist(){if(confirm('למחוק?')){localStorage.removeItem('bq');renderHistory();}}
 buildSetup();
